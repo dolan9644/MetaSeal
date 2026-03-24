@@ -49,6 +49,8 @@ const translations = {
     error_no_output: "错误：输出目录尚未挂载，请前往偏好设置配置。",
     engine_header_suite: "防护引擎套件 (Engine Suite)",
     engine_header_archive: "去中心化归档矩阵 (Arweave & OTS)",
+    settings_arweave: "Arweave 身份密钥 (.json)",
+    settings_arweave_desc: "导入 ArConnect 导出的钱包密钥以激活区块链永久归档",
     tech_standard_title: "基础频域盲水印印记",
     tech_standard_desc: "注入数学级特征值。对人眼完全隐蔽，抵抗强力压缩与二次裁切行为。",
     tech_enhanced_title: "ONNX 对抗性 AI 盾阵",
@@ -100,6 +102,8 @@ const translations = {
     error_no_output: "Error: Output volume unmounted. Please configure in Preferences.",
     engine_header_suite: "Protection Engine Suite",
     engine_header_archive: "Decentralized Archive Matrix (Arweave & OTS)",
+    settings_arweave: "Arweave Identity Key (.json)",
+    settings_arweave_desc: "Import your ArConnect JSON key to activate permanent archiving",
     tech_standard_title: "Frequency Domain Math Watermark",
     tech_standard_desc: "Injects mathematical eigenvalues. Completely invisible, resists heavy compression.",
     tech_enhanced_title: "ONNX Adversarial AI Shield",
@@ -139,7 +143,8 @@ function App() {
     copyright_suffix: "All Rights Reserved",
     source_dir: null,
     output_dir: null,
-    format_preference: "original"
+    format_preference: "original",
+    arweave_key: ""
   });
 
   const [activeTab, setActiveTab] = useState('Images'); 
@@ -421,6 +426,20 @@ function App() {
             <div className="setting-desc">{settings.output_dir || '当前处于未挂载状态'}</div>
           </div>
           <button className="secondary-btn" onClick={() => handlePickFolder('output_dir')}>{t.settings_choose}</button>
+        </div>
+      </div>
+
+      <div className="settings-section">
+        <div className="settings-header">去中心化归档配置</div>
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className="setting-title">{t.settings_arweave}</div>
+            <div className="setting-desc">{settings.arweave_key ? `已挂载: ...${settings.arweave_key.slice(-15)}` : t.settings_arweave_desc}</div>
+          </div>
+          <button className="secondary-btn" onClick={async () => {
+            const selected = await open({ filters: [{ name: 'JSON', extensions: ['json'] }] });
+            if (selected) setSettings({...settings, arweave_key: selected as string});
+          }}>{t.settings_choose}</button>
         </div>
       </div>
     </div>
