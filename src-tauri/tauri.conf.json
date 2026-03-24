@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "metashield",
+        "title": "MetaSeal",
         "width": 800,
         "height": 600
       }
