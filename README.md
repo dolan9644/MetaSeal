@@ -36,6 +36,11 @@ MetaSeal/
 │   └── Cargo.toml        # Rust Dependencies
 ```
 
+### 💻 System Compatibility
+- **Windows**: x64 (Full Support)
+- **macOS**: Apple Silicon (M1/M2/M3) - **Full Support**.
+- **macOS**: Intel (x86_64) - **Limited Support** (Basic DCT watermarking only; ONNX Shield engine requires manual compilation).
+
 ### 🚀 Build & Run
 **Prerequisites:** Node.js (v18+), Rust (1.70+), and OS-specific build tools (e.g., Xcode for macOS).
 ```bash
@@ -92,6 +97,11 @@ MetaSeal/
 │   │   └── model_manager.rs # ONNX 专家级运行库及系统卷分配器
 │   └── Cargo.toml        # Rust 核心包依赖树
 ```
+
+### 💻 系统兼容性说明
+- **Windows**: x64 (全功能支持)
+- **macOS (Apple Silicon)**: M1/M2/M3 系列芯片 - **全功能支持**。
+- **macOS (Intel)**: 仅支持基础频域水印；由于 `ort` 依赖链限制，ONNX 增强引擎在 Intel Mac 上需手动编译适配。
 
 ### 🚀 编译与开发向导
 **基础前置环境:** Node.js (v18+), Rust (1.70+), 以及对应操作系统的原生编译链 (例如 macOS 需安装 Xcode Command Line Tools)。
