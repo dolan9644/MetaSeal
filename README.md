@@ -49,8 +49,15 @@ npm run tauri dev
 npm run tauri build
 ```
 
+### ⚠️ Disclaimer
+This software is provided "as is", without warranty of any kind. It is intended for technical exchange and personal creative protection only. The author shall not be held liable for any direct or indirect legal consequences arising from the use of this tool.
+
 ### 📄 License
 This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
+
+---
+
+**Copyright (c) 2026 xastle. All rights reserved.**
 
 ---
 
@@ -99,5 +106,12 @@ npm run tauri dev
 npm run tauri build
 ```
 
+### ⚠️ 免责声明
+本软件按“原样”提供，不附带任何形式的保证。本工具仅供技术交流与创作者自我保护使用，作者不对由于使用本工具造成的任何直接或间接法律后果承担责任。
+
 ### 📄 开源协议说明
 本项目遵循 **Apache License 2.0** 开源协议发行，允许商业使用、修改及分发。详见工程根目录下的 [LICENSE](LICENSE) 文档。
+
+---
+
+**Copyright (c) 2026 xastle. All rights reserved.**
