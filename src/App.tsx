@@ -43,6 +43,10 @@ const translations = {
     batch_no_path: "执行中断：请先在偏好设定中挂载【源路径】与【输出路径】。",
     verify_success: "验证通过：此结构包含合法签章。",
     verify_failed: "未探测到特征签章：该文件可能未加固，或结构彻底破坏。",
+    status_verifying: "🔍 正在提取并分析安全指纹...",
+    status_scanning: "🔍 正在扫描数据卷...",
+    status_compiling: "🚀 正在编译防护哈希值...",
+    error_no_output: "错误：输出目录尚未挂载，请前往偏好设置配置。",
     engine_header_suite: "防护引擎套件 (Engine Suite)",
     engine_header_archive: "去中心化归档矩阵 (Arweave & OTS)",
     tech_standard_title: "基础频域盲水印印记",
@@ -90,6 +94,10 @@ const translations = {
     batch_no_path: "Halt: Please mount [Source] and [Output] paths in Preferences first.",
     verify_success: "Verification Passed: This structure contains a valid signature.",
     verify_failed: "No signature detected: asset unprotected or structurally corrupted.",
+    status_verifying: "🔍 Extracting and analyzing security fingerprint...",
+    status_scanning: "🔍 Scanning data volumes...",
+    status_compiling: "🚀 Compiling protection hash...",
+    error_no_output: "Error: Output volume unmounted. Please configure in Preferences.",
     engine_header_suite: "Protection Engine Suite",
     engine_header_archive: "Decentralized Archive Matrix (Arweave & OTS)",
     tech_standard_title: "Frequency Domain Math Watermark",
@@ -193,11 +201,15 @@ function App() {
   const handleVerifyFile = async () => {
     const selected = await open({ multiple: false });
     if (selected) {
-      setStatus("🔍 Indexing frequency components...");
+      setStatus(t.status_verifying);
       try {
-        const res: any = await invoke("verify_image_t1", { path: selected as string });
+        // 按当前激活的 Tab 路由到正确的查验引擎
+        let cmd = "verify_image_t1";
+        if (activeTab === 'Text') cmd = "verify_document";
+        else if (activeTab === 'Code') cmd = "verify_code";
+        const res: any = await invoke(cmd, { path: selected as string });
         setScannerResult(res);
-        setStatus(t.verify_success);
+        setStatus(res.success ? t.verify_success : t.verify_failed);
       } catch (e) {
         setScannerResult({ success: false });
         setStatus(t.verify_failed);
@@ -221,7 +233,7 @@ function App() {
       setStatus(t.batch_no_path);
       return;
     }
-    setStatus("🔍 Scanning Data Volumes...");
+    setStatus(t.status_scanning);
     try {
       const files: any = await invoke("get_unprotected_files", { 
         sourceDir: settings.source_dir, 
@@ -235,13 +247,13 @@ function App() {
   const handleExecuteProtection = async (manualPath?: string) => {
     const selectedFile = manualPath || `demo_${activeTab.toLowerCase()}_asset.bin`;
     if (!settings.output_dir) {
-      setStatus("Error: Output Volume unmounted. Proceed to Settings.");
+      setStatus(t.error_no_output);
       setActiveTab('Settings');
       return;
     }
 
     setIsProcessing(true);
-    setStatus("🚀 Compiling Protection Hash...");
+    setStatus(t.status_compiling);
 
     try {
       let output_path = "";
