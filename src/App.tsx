@@ -485,7 +485,7 @@ function App() {
             <div className="setting-desc">
                 {t.archive_desc}
                 <br />
-                <a href="#" className="external-link" onClick={(e) => { e.preventDefault(); alert("即将跳转至 Arweave Wallet 开发文档指南（模拟区）"); }}>{t.archive_link}</a>
+                <a href="#" className="external-link" onClick={(e) => { e.preventDefault(); window.open("https://github.com/dolan9644/MetaSeal/blob/main/docs/USER_GUIDE_zh.md", "_blank"); }}>{t.archive_link}</a>
             </div>
           </div>
           <label className="toggle">
