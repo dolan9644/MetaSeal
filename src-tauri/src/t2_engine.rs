@@ -85,10 +85,8 @@ fn apply_onnx_deep_shield(input: &str, output: &str, model_path: &Path) -> CvRes
         return apply_f_sam_logic(input, output);
     }
 
-    // 2. 加载模型
-    let _model = Session::builder()
-        .map_err(|e: ort::Error| opencv::Error::new(core::StsError, e.to_string()))?
-        .commit_from_file(model_path)
+    // 2. 加载模型 (ort 1.16.3 API)
+    let _model = Session::new(model_path)
         .map_err(|e: ort::Error| opencv::Error::new(core::StsError, e.to_string()))?;
 
     // 3. 读取并处理图片 (此处简略：Resize -> Array -> Inference -> Unresize)
