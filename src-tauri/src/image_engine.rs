@@ -47,43 +47,53 @@ fn inject_dct_watermark(input_path: &str, output_dir: &str) -> Result<Protection
         .and_then(|n| n.to_str()).unwrap_or("unknown");
     let output_path = Path::new(output_dir).join(format!("seal_{}", file_name));
 
-    // 2. 转换为 RGB —— 在亮度 (Y) 通道上操作
+    // 2. 提取三个颜色通道，分别在频域操作保持色彩准确
     let rgb = img.to_rgb8();
-    let mut pixels: Vec<f32> = rgb.pixels()
-        .map(|p| 0.299 * p[0] as f32 + 0.587 * p[1] as f32 + 0.114 * p[2] as f32)
-        .collect();
+    let mut pixels_r: Vec<f32> = rgb.pixels().map(|p| p[0] as f32).collect();
+    let mut pixels_g: Vec<f32> = rgb.pixels().map(|p| p[1] as f32).collect();
+    let mut pixels_b: Vec<f32> = rgb.pixels().map(|p| p[2] as f32).collect();
 
-    // 3. 用 rustdct 对一维化的亮度通道做 DCT-II 变换
+    let n = pixels_r.len();
+    let n_f32 = n as f32;
     let mut planner = DctPlanner::new();
-    let dct = planner.plan_dct2(pixels.len());
-    dct.process_dct2(&mut pixels);
 
-    // 4. 在中频区段注入水印强度 (MetaSeal 印记)
-    let mid_start = pixels.len() / 4;
-    let mid_end = pixels.len() / 2;
-    let watermark_strength: f32 = 0.5;
-    for i in mid_start..mid_end {
-        pixels[i] += watermark_strength;
+    // 3. 水印强度：按信号长度缩放，确保逆变换后 delta 约为 ±1 像素级
+    let watermark_strength: f32 = 0.8 * n_f32;
+
+    // 4. 对每个通道执行 DCT → 注入中频水印 → IDCT → 归一化
+    let mid_start = n / 4;
+    let mid_end = n / 2;
+
+    for channel in [&mut pixels_r, &mut pixels_g, &mut pixels_b] {
+        let dct = planner.plan_dct2(n);
+        dct.process_dct2(channel);
+
+        // 在中频区段注入水印 (MetaSeal 印记)
+        for i in mid_start..mid_end {
+            channel[i] += watermark_strength;
+        }
+
+        let idct = planner.plan_dct3(n);
+        idct.process_dct3(channel);
+
+        // ★ 关键修复：rustdct 的 DCT-II/DCT-III 往返会将值放大 2*N 倍
+        // 必须在逆变换后除以 2*N 进行归一化
+        let norm = 2.0 * n_f32;
+        for val in channel.iter_mut() {
+            *val /= norm;
+        }
     }
 
-    // 5. 逆 DCT-III 还原
-    let idct = planner.plan_dct3(pixels.len());
-    idct.process_dct3(&mut pixels);
-
-    // 6. 把修改后的亮度映射回 RGB 并写出
-    let raw = rgb.into_raw();
+    // 5. 重建 RGB 图像
     let mut out_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
     for (idx, (x, y, _)) in img.pixels().enumerate() {
-        let orig_pixel = raw[idx * 3..idx * 3 + 3].to_vec();
-        let orig_lum = 0.299 * orig_pixel[0] as f32 + 0.587 * orig_pixel[1] as f32 + 0.114 * orig_pixel[2] as f32;
-        let delta = pixels[idx] - orig_lum;
-        let r = (orig_pixel[0] as f32 + delta).clamp(0.0, 255.0) as u8;
-        let g = (orig_pixel[1] as f32 + delta * 0.7).clamp(0.0, 255.0) as u8;
-        let b = (orig_pixel[2] as f32 + delta * 0.5).clamp(0.0, 255.0) as u8;
+        let r = pixels_r[idx].round().clamp(0.0, 255.0) as u8;
+        let g = pixels_g[idx].round().clamp(0.0, 255.0) as u8;
+        let b = pixels_b[idx].round().clamp(0.0, 255.0) as u8;
         out_buf.put_pixel(x, y, Rgb([r, g, b]));
     }
 
-    // 7. 保存为与原格式一致的文件
+    // 6. 保存为与原格式一致的文件
     let output_str = output_path.to_string_lossy().to_string();
     out_buf.save(&output_path).map_err(|e| format!("写出图像失败: {}", e))?;
 

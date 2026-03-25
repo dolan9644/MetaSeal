@@ -608,3 +608,13 @@ input[type="text"]:focus, select:focus {
 }
 
 /* Certificate is preserved via cascade mostly */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tech-perf-note.warning {
+  color: #FF3B30 !important;
+  animation: fadeIn 0.3s ease-out;
+}

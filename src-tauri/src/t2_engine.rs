@@ -79,30 +79,37 @@ fn apply_f_sam_noise(input_path: &str, output_dir: &str) -> Result<String, Strin
     let mut pixels_b: Vec<f32> = rgb.pixels().map(|p| p[2] as f32).collect();
 
     let n = pixels_r.len();
+    let n_f32 = n as f32;
     let mut planner = DctPlanner::new();
-    let dct = planner.plan_dct2(n);
 
     // 对每个颜色通道进行高频扰动
     for (channel, intensity) in [(&mut pixels_r, 1.2f32), (&mut pixels_g, 0.9f32), (&mut pixels_b, 0.7f32)] {
+        let dct = planner.plan_dct2(n);
         dct.process_dct2(channel);
 
-        // 注入高频区段的对抗噪声
+        // 注入高频区段的对抗噪声（强度按 N 缩放）
         let high_start = n * 5 / 8;
         for i in high_start..n {
-            let offset = ((i % 11) as f32 * 0.1 - 0.5) * intensity;
+            let offset = ((i % 11) as f32 * 0.1 - 0.5) * intensity * n_f32;
             channel[i] += offset;
         }
 
         let idct = planner.plan_dct3(n);
         idct.process_dct3(channel);
+
+        // ★ 关键修复：DCT-II/DCT-III 往返后必须除以 2*N 进行归一化
+        let norm = 2.0 * n_f32;
+        for val in channel.iter_mut() {
+            *val /= norm;
+        }
     }
 
     // 重建 RGB 图像
     let mut out_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
     for (idx, (x, y, _)) in img.pixels().enumerate() {
-        let r = pixels_r[idx].clamp(0.0, 255.0) as u8;
-        let g = pixels_g[idx].clamp(0.0, 255.0) as u8;
-        let b = pixels_b[idx].clamp(0.0, 255.0) as u8;
+        let r = pixels_r[idx].round().clamp(0.0, 255.0) as u8;
+        let g = pixels_g[idx].round().clamp(0.0, 255.0) as u8;
+        let b = pixels_b[idx].round().clamp(0.0, 255.0) as u8;
         out_buf.put_pixel(x, y, Rgb([r, g, b]));
     }
 

@@ -165,6 +165,7 @@ function App() {
   const [isEnchancedDownloaded, setIsEnchancedDownloaded] = useState(false);
   const [downloadMsg, setDownloadMsg] = useState("");
   const [onboardingDismissed, setOnboardingDismissed] = useState(localStorage.getItem('metaseal_onboarding_dismissed') === 'true');
+  const [toggleWarning, setToggleWarning] = useState("");
 
   const t = translations[settings.language as keyof typeof translations] || translations["zh-CN"];
 
@@ -222,11 +223,50 @@ function App() {
   };
 
   const handlePickFileAndProtect = async () => {
-    const selected = await open({ multiple: false });
-    if (selected) {
-      handleExecuteProtection(selected as string);
+    try {
+      const selected = await open({ 
+        multiple: true,
+        filters: [
+          { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] },
+          { name: 'Documents', extensions: ['txt', 'md', 'csv'] },
+          { name: 'Code', extensions: ['rs', 'js', 'ts', 'py', 'c', 'cpp', 'go'] }
+        ]
+      });
+      if (selected && Array.isArray(selected)) {
+        for (const file of selected) {
+          await handleExecuteProtection(file);
+        }
+      } else if (selected) {
+        await handleExecuteProtection(selected as string);
+      }
+    } catch (e) {
+      console.error("File picker error:", e);
     }
   };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // HTML5 Drag Events are mostly for visual feedback here.
+    // The actual path retrieval is handled by the tauri://drag-drop listener
+    // in the useEffect above, which has access to the OS file system paths.
+  };
+
+  // Add Tauri drag-drop listener
+  useEffect(() => {
+    let unlisten: any;
+    import('@tauri-apps/api/event').then(({ listen }) => {
+      listen("tauri://drag-drop", (event: any) => {
+        const paths = event.payload.paths;
+        if (paths && paths.length > 0) {
+          for (const path of paths) {
+            handleExecuteProtection(path);
+          }
+        }
+      }).then(u => unlisten = u);
+    });
+    return () => { if (unlisten) unlisten(); };
+  }, [activeTab, isT2Enabled, settings.output_dir]);
 
   const handleVerifyFile = async () => {
     const selected = await open({ multiple: false });
@@ -493,7 +533,11 @@ function App() {
       {getArchitectureExplainer()}
 
       {inputMode === 'OneOff' ? (
-        <div className="dropzone" onClick={isProcessing ? undefined : handlePickFileAndProtect} style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
+        <div className="dropzone" 
+             onClick={isProcessing ? undefined : handlePickFileAndProtect} 
+             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+             onDrop={handleDrop}
+             style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
           <div className="drop-icon-wrapper"><UploadArrowIcon /></div>
           <div className="drop-text">{isProcessing ? t.processing : (status || t.drop_hint)}</div>
           <div className="drop-subtext">{getFormatSubtext()}</div>
@@ -503,7 +547,13 @@ function App() {
           <div className="batch-controls">
             <button className="secondary-btn" onClick={handleScanBatch}>{t.batch_scan}</button>
             {pendingBatchFiles.length > 0 && (
-              <button className="primary-btn" onClick={() => handleExecuteProtection(pendingBatchFiles[0])}>{t.batch_run}</button>
+              <button className="primary-btn" onClick={async () => {
+                const files = [...pendingBatchFiles];
+                setPendingBatchFiles([]);
+                for (const f of files) {
+                  await handleExecuteProtection(f);
+                }
+              }}>{t.batch_run}</button>
             )}
           </div>
           <div className="batch-status">{status || t.batch_empty}</div>
@@ -536,10 +586,20 @@ function App() {
                 ) : (
                   <span className="tech-perf-note" style={{color: '#34C759'}}>{downloadMsg || t.tech_enhanced_perf}</span>
                 )}
+                {toggleWarning === 'onnx' && (
+                  <span className="tech-perf-note warning" style={{marginLeft: '10px'}}>请先部署环境</span>
+                )}
               </div>
             </div>
             <label className="toggle">
-              <input type="checkbox" checked={isT2Enabled} onChange={(e) => setIsT2Enabled(e.target.checked)} />
+              <input type="checkbox" checked={isT2Enabled} onChange={(e) => {
+                if (e.target.checked && !isEnchancedDownloaded) {
+                  setToggleWarning('onnx');
+                  setTimeout(() => setToggleWarning(""), 3000);
+                  return;
+                }
+                setIsT2Enabled(e.target.checked);
+              }} />
               <span className="slider"></span>
             </label>
           </div>
@@ -552,11 +612,22 @@ function App() {
                 {t.archive_desc}
                 <br />
                 <a href="#" className="external-link" onClick={(e) => { e.preventDefault(); window.open("https://github.com/dolan9644/MetaSeal/blob/main/docs/USER_GUIDE_zh.md", "_blank"); }}>{t.archive_link}</a>
+                {toggleWarning === 'arweave' && (
+                  <span className="tech-perf-note warning" style={{display: 'block', marginTop: '4px'}}>请先在设置中导入 Arweave 密钥</span>
+                )}
             </div>
           </div>
           <label className="toggle">
             <input type="checkbox" checked={isOtsEnabled || isArweaveEnabled} 
-                   onChange={(e) => { setIsOtsEnabled(e.target.checked); setIsArweaveEnabled(e.target.checked); }} />
+                   onChange={(e) => { 
+                     if (e.target.checked && (!settings.arweave_key || settings.arweave_key === "")) {
+                       setToggleWarning('arweave');
+                       setTimeout(() => setToggleWarning(""), 4000);
+                       return;
+                     }
+                     setIsOtsEnabled(e.target.checked); 
+                     setIsArweaveEnabled(e.target.checked); 
+                   }} />
             <span className="slider"></span>
           </label>
         </div>
@@ -575,7 +646,10 @@ function App() {
       <div className="page-header">
         <h1 className="page-title">{t.nav_scanner}</h1>
       </div>
-      <div className="dropzone" onClick={handleVerifyFile}>
+      <div className="dropzone" 
+           onClick={handleVerifyFile}
+           onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+           onDrop={handleDrop}>
         <div className="drop-icon-wrapper"><VerifyMagnifyIcon /></div>
         <div className="drop-text">{status || "在此挂载数字资产以提取安全指纹"}</div>
         <div className="drop-subtext">原印协议引擎能够追踪提取非结构化文件内部的嵌入式结构</div>
