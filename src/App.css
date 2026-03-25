@@ -501,33 +501,42 @@ input[type="text"]:focus, select:focus {
   margin-top: 4px;
 }
 
-/* Banner */
-.onboarding-banner {
-  background: #FFFBEB;
-  color: #B45309;
-  padding: 12px 24px;
+/* Onboarding Modal */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border-bottom: 1px solid #FDE68A;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
 }
 
-[data-theme="dark"] .onboarding-banner {
-  background: #451A03;
-  color: #FDE68A;
-  border-bottom: 1px solid #78350F;
+.onboarding-card {
+  background: var(--bg-main);
+  width: 440px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid var(--border-color);
 }
 
-.onboarding-banner button {
-  background: transparent;
-  border: 1px solid currentColor;
-  color: inherit;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 12px;
+.onboarding-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-main);
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Verify Result */

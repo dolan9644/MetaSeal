@@ -164,6 +164,7 @@ function App() {
   const [isArweaveEnabled, setIsArweaveEnabled] = useState(false);
   const [isEnchancedDownloaded, setIsEnchancedDownloaded] = useState(false);
   const [downloadMsg, setDownloadMsg] = useState("");
+  const [onboardingDismissed, setOnboardingDismissed] = useState(localStorage.getItem('metaseal_onboarding_dismissed') === 'true');
 
   const t = translations[settings.language as keyof typeof translations] || translations["zh-CN"];
 
@@ -192,8 +193,32 @@ function App() {
   };
 
   const handlePickFolder = async (key: 'source_dir' | 'output_dir') => {
-    const selected = await open({ directory: true, multiple: false });
-    if (selected) saveSettingsToRust({ ...settings, [key]: selected });
+    try {
+      const selected = await open({ directory: true, multiple: false });
+      if (selected) {
+        const newSettings = { ...settings, [key]: selected };
+        saveSettingsToRust(newSettings);
+      }
+    } catch (e) {
+      console.error("Failed to open directory dialog:", e);
+      setStatus("❌ 无法打开目录选择器，请检查权限。");
+    }
+  };
+
+  const handlePickArweaveKey = async () => {
+    try {
+      const selected = await open({ 
+        filters: [{ name: 'JSON Key', extensions: ['json'] }],
+        multiple: false 
+      });
+      if (selected) {
+        const newSettings = { ...settings, arweave_key: selected as string };
+        saveSettingsToRust(newSettings);
+      }
+    } catch (e) {
+      console.error("Failed to open file dialog:", e);
+      setStatus("❌ 无法打开文件选择器，请检查权限。");
+    }
   };
 
   const handlePickFileAndProtect = async () => {
@@ -343,10 +368,23 @@ function App() {
   };
 
   // --- Sub-Components ---
-  const OnboardingBanner = () => (
-    <div className="onboarding-banner" onClick={() => setActiveTab('Settings')}>
-      <span>⚠️ {t.onboarding_desc} </span>
-      <button>{t.onboarding_btn}</button>
+  const OnboardingModal = () => (
+    <div className="onboarding-overlay">
+      <div className="onboarding-card">
+        <BrandLogoElement />
+        <p>{t.onboarding_desc}</p>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+          <button className="primary-btn" onClick={() => {
+            setActiveTab('Settings');
+            localStorage.setItem('metaseal_onboarding_dismissed', 'true');
+            setOnboardingDismissed(true);
+          }}>{t.onboarding_btn}</button>
+          <button className="secondary-btn" onClick={() => {
+             localStorage.setItem('metaseal_onboarding_dismissed', 'true');
+             setOnboardingDismissed(true);
+          }}>稍后设置</button>
+        </div>
+      </div>
     </div>
   );
 
@@ -436,10 +474,7 @@ function App() {
             <div className="setting-title">{t.settings_arweave}</div>
             <div className="setting-desc">{settings.arweave_key ? `已挂载: ...${settings.arweave_key.slice(-15)}` : t.settings_arweave_desc}</div>
           </div>
-          <button className="secondary-btn" onClick={async () => {
-            const selected = await open({ filters: [{ name: 'JSON', extensions: ['json'] }] });
-            if (selected) setSettings({...settings, arweave_key: selected as string});
-          }}>{t.settings_choose}</button>
+          <button className="secondary-btn" onClick={handlePickArweaveKey}>{t.settings_choose}</button>
         </div>
       </div>
     </div>
@@ -497,7 +532,7 @@ function App() {
               
               <div style={{ marginTop: '12px' }}>
                 {!isEnchancedDownloaded ? (
-                  <button className="download-tiny-btn" onClick={handleDownloadModel}>{downloadMsg || "↓ 部署 ONNX 本地环境 (~420MB)"}</button>
+                  <button className="download-tiny-btn" onClick={handleDownloadModel}>{downloadMsg || "↓ 部署 ONNX 本地环境 (~97MB)"}</button>
                 ) : (
                   <span className="tech-perf-note" style={{color: '#34C759'}}>{downloadMsg || t.tech_enhanced_perf}</span>
                 )}
@@ -596,7 +631,7 @@ function App() {
 
   return (
     <div className="app-container" data-theme={settings.theme}>
-      {!settings.output_dir && ['Images', 'Text', 'Code'].includes(activeTab) && <OnboardingBanner />}
+      {!settings.output_dir && !onboardingDismissed && <OnboardingModal />}
       
       <div className="sidebar">
         <BrandLogoElement />
