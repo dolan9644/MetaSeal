@@ -13,6 +13,8 @@ pub struct AppSettings {
     pub source_dir: Option<PathBuf>,
     pub output_dir: Option<PathBuf>,
     pub format_preference: String, // "original" | "png" | "jpg"
+    #[serde(default)]
+    pub arweave_key: Option<String>,
 }
 
 impl Default for AppSettings {
@@ -25,6 +27,7 @@ impl Default for AppSettings {
             source_dir: None,
             output_dir: None,
             format_preference: "original".to_string(),
+            arweave_key: None,
         }
     }
 }

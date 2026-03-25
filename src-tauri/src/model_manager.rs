@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs;
 
 use std::fs::File;
@@ -24,11 +24,12 @@ pub const MODEL_FILENAME: &str = "t2_onnx_shield_v1.onnx";
 pub const MODEL_URL: &str = "https://github.com/onnx/models/raw/main/validated/vision/classification/resnet/model/resnet50-v1-7.onnx";
 
 pub fn get_model_path() -> PathBuf {
-    let home = Path::new("/private/tmp/MetaSeal/models");
-    if !home.exists() {
-        fs::create_dir_all(home).ok();
+    let home_dir = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    let model_dir = PathBuf::from(home_dir).join(".metaseal").join("models");
+    if !model_dir.exists() {
+        fs::create_dir_all(&model_dir).ok();
     }
-    home.join(MODEL_FILENAME)
+    model_dir.join(MODEL_FILENAME)
 }
 
 pub fn check_model_exists() -> bool {
