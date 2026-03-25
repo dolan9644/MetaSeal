@@ -65,3 +65,15 @@ pub async fn download_model() -> Result<String, String> {
 
     Ok(format!("下载完美达成。已成功部署 {} MB 级别的专家防护核心。", downloaded / 1024 / 1024))
 }
+
+/// 检查当前平台是否支持 ONNX 专家引擎
+pub fn is_onnx_supported() -> bool {
+    #[cfg(any(target_arch = "aarch64", target_os = "windows"))]
+    {
+        true
+    }
+    #[cfg(not(any(target_arch = "aarch64", target_os = "windows")))]
+    {
+        false
+    }
+}

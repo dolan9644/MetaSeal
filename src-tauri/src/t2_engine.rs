@@ -34,7 +34,9 @@ pub struct T2Result {
 pub async fn apply_t2_protection(input_path: &str, output_dir: &str) -> Result<T2Result, String> {
     let input_path_own = input_path.to_string();
     let output_dir_own = output_dir.to_string();
-    let model_exists = model_manager::check_model_exists();
+    
+    // 检查模型是否存在以及平台是否支持
+    let model_exists = model_manager::check_model_exists() && model_manager::is_onnx_supported();
 
     let handle = tokio::task::spawn_blocking(move || {
         apply_f_sam_noise(&input_path_own, &output_dir_own)
@@ -42,10 +44,14 @@ pub async fn apply_t2_protection(input_path: &str, output_dir: &str) -> Result<T
 
     match handle.await.map_err(|e| e.to_string())? {
         Ok(output_path) => {
-            let mode = if model_exists { "ONNX 专家档" } else { "F-SAM 均衡档" };
+            let mode = if model_exists { "ONNX 专家档" } else { "F-SAM 均衡档 (Intel Mac 兼容模式)" };
             Ok(T2Result {
                 success: true,
-                message: format!("已通过 {} 注入对抗掩码。您的创作已具备深度防抓取能力。", mode),
+                message: if model_exists {
+                    format!("已通过 {} 注入对抗掩码。您的创作已具备深度防抓取能力。", mode)
+                } else {
+                    format!("已启用 {}。正在通过纯 Rust 频域引擎保护您的创作。", mode)
+                },
                 output_path: Some(output_path),
                 mode: mode.into(),
             })
