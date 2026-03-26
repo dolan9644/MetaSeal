@@ -1,6 +1,6 @@
 [package]
 name = "metaseal"
-version = "0.1.0"
+version = "0.1.14"
 description = "MetaSeal - Creator Copyright Protection Tool"
 authors = ["xastle"]
 edition = "2021"
