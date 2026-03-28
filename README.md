@@ -1,79 +1,207 @@
-# MetaSeal (元印) 🛡️
+<div align="center">
 
-**Professional Digital Asset Provenance & Anti-AI Protection Suite**
+# 元印 · MetaSeal
 
-MetaSeal is a high-performance, local-first desktop application designed for creators who require absolute control over their digital intellectual property. By combining frequency-domain steganography, adversarial machine learning, and decentralized ledger technology, MetaSeal provides a "cryptographic seal" for images, documents, and source code.
+**为创作者而生的版权保护工具**
 
-[English](#english) | [简体中文](#简体中文)
+*Protect your art. Prove your ownership. Forever.*
+
+[简体中文](#简体中文) | [English](#english)
 
 ---
 
-<a id="english"></a>
-## 🌐 English
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.14-green)
+![Local First](https://img.shields.io/badge/100%25-本地运行-orange)
 
-### 📘 Overview
-MetaSeal addresses the growing challenges of digital copyright in the age of Generative AI. It allows creators to embed invisible, resilient ownership data into their files and anchor them to global blockchains, ensuring that provenance remains intact regardless of how the asset is distributed, compressed, or scraped.
-
-### 🚀 Core Technologies & Implementation
-
-#### 1. Image Protection: Multi-Layer Defense
-*   **Invisible Watermarking (T1)**: Uses **Discrete Cosine Transform (DCT)** to embed ownership eigenvalues directly into the frequency domain of the image. This method is resilient against lossy compression (JPEG), resizing, and screenshots.
-*   **Adversarial AI Shield (T2)**: Powered by an **ONNX-based Neural Engine**, it injects subliminal adversarial perturbations (noise) into the image. This "poisoning" prevents AI scrapers from accurately extracting style matrices or using the art for model training without causing structural degradation to the AI's output.
-
-#### 2. Text Provenance: Zero-Width Steganography
-*   **ZWSP Injection**: Embeds a unique cryptographic signature using **Zero-Width Space (ZWSP)** characters. These characters are invisible to the human eye and standard text editors but can be detected by the MetaSeal scanner, tracking the origin of text even after being copied and pasted across platforms.
-
-#### 3. Source Code Integrity
-*   **Cryptographic Signatures**: Automatically injects a UUID-based, Apache 2.0 compliant signature block into the header of source files. It supports multiple languages (Rust, Python, JS, etc.) by respecting specific comment syntaxes, ensuring legal ownership is declared at the file level.
-
-#### 4. Decentralized Anchoring (Dweb)
-*   **OpenTimestamps (OTS)**: Anchors a SHA-256 hash of the protected file to the **Bitcoin Blockchain**. This provides a trustless, zero-cost Proof of Existence (PoE) with a precise timestamp.
-*   **Arweave Permaweb**: Optionally backups asset metadata and hashes to Arweave, ensuring that the record of your creation survives as long as the internet exists.
-
-### 💻 Supported Platforms
-| Platform | Architecture | Support Level | Features |
-| :--- | :--- | :--- | :--- |
-| **macOS** | Apple Silicon (M1/2/3) | **Native / Full** | All Engines + ONNX Accel |
-| **macOS** | Intel (x86_64) | **Partial** | DCT Watermark + Text/Code (ONNX requires custom build) |
-| **Windows** | x64/x86 | **Full** | All Engines + ONNX Runtime |
+</div>
 
 ---
 
 <a id="简体中文"></a>
-## 🇨🇳 简体中文
+## 你的作品，你说了算
 
-### 📘 项目概述
-**元印 (MetaSeal)** 是一款为创作者打造的专业级数字资产防护工具。在生成式 AI 时代，元印通过融合**频域隐写术**、**对抗性机器学习**与**去中心化账本技术**，为图片、文档、源码提供不可逆的“数字签名”。
+你画了一张图，发到网上，被人截图盗用，被 AI 爬去训练，甚至有人反过来说那是他画的。
+现在你有了一个武器。
 
-### 🚀 技术实现方案
+**元印 (MetaSeal)** 做三件事：
 
-#### 1. 图像防护：多维防御矩阵
-*   **隐藏水印 (T1 均衡档)**：采用 **离散余弦变换 (DCT)** 算法，将版权特征值植入图像的频域。该技术具备极强的抗攻击性，在经历高强度压缩（JPEG）、二次截图、比例裁剪后，仍能准确提取作者信息。
-*   **AI 对抗盾阵 (T2 增强档)**：基于 **ONNX 本地神经网络引擎**，在图像中植入人眼不可察觉的对抗性扰动（Adversarial Perturbations）。这种“样本投毒”技术可以有效干扰爬虫 AI 的风格提取，防止您的绘画风格被 AI 无偿学习。
+1. **在你的作品里打上看不见的印记** — 即使被截图、压缩、裁剪，依然可以扫出你的名字
+2. **让 AI 爬虫认不出你的画风** — 你的风格不会被 AI 拿去模仿或训练
+3. **用比特币区块链给你的作品打上时间戳** — 全世界任何人都无法伪造"你先画的"这个事实
 
-#### 2. 文字确权：零宽字符隐写
-*   **ZWSP 注入**：利用**零宽字符 (Zero-Width Space)** 在文本流中嵌入加密署名。这些字符在常规编辑器中完全隐形，但在元印查验引擎下无所遁形。即使文字经由社交软件多次复制粘贴，其权属指纹依然存在。
+完全在本地运行。你的原图永远不会离开你的电脑。
 
-#### 3. 源码保护： AST 注释签章
-*   **密码学签名**：自动识别编程语言语境，并在文件头部植入符合 Apache 2.0 规范的 UUID 签章块。支持 Rust, Python, JavaScript, C++ 等主流语言，确保每一行代码都带有合法的著作权声明。
+---
 
-#### 4. 去中心化锚定 (区块链存证)
-*   **OpenTimestamps (OTS)**：将受保护文件的 SHA-256 哈希值锚定至**比特币区块链**。利用工作量证明 (PoW) 提供具有法律效力的“存在性证明”，记录精确到秒的创作时间。
-*   **Arweave 永久存储**：支持将资产指纹与元数据同步至 Arweave 永存网，实现真正的“一处保存，万年流传”。
+## 功能一览
 
-### 💻 平台兼容性矩阵
-| 操作系统 | 硬件架构 | 支持等级 | 核心功能 |
-| :--- | :--- | :--- | :--- |
-| **macOS** | Apple Silicon (M1/2/3) | **原生全功能** | 全防护引擎 + 硬件加速 |
-| **macOS** | Intel (x86_64) | **标准级支持** | DCT 水印 + 文档/源码 (AI 增强引擎需手动编译) |
-| **Windows** | x64/x86 | **全功能支持** | 全防护引擎 + ONNX 运行时 |
+### 🖼️ 图片保护
 
-### 🛡️ 安全与隐私架构
-*   **100% 本地化**：所有加密、哈希计算、AI 扰动生成均在您的电脑端侧完成。
-*   **零数据离机**：MetaSeal 拒绝任何形式的云端上传，您的原件始终处于您的物理控制之下。
+将图片拖进软件，一键完成：
 
-### 📄 License
-**Apache License 2.0**.
+| 保护层 | 是什么 | 能防什么 |
+|--------|--------|---------|
+| **版权印记** | 嵌入肉眼看不见的署名信息 | 截图盗用、裁剪后仍可追溯 |
+| **防 AI 抓取** | 在画面深层加入 AI 无法识别的干扰 | AI 模型无法提取你的画风或风格 |
 
-**Copyright (c) 2026 xastle. All rights reserved.**
+两种保护可以叠加使用，也可以单独开启。支持一次处理多张图片。
 
+### 📝 文字确权
+
+把文章的 `.txt` / `.md` 文件拖进软件，文字内部会被植入看不见的署名标记。
+小偷复制你的文章发到任何平台，把他的文字拖回软件，立刻扫出你的签名。
+
+### 💻 代码保护
+
+把源码文件拖进软件，自动在文件头部注入不可剥离的版权签章。
+适合开发者保护私有逻辑或开源项目版权归属。支持 Rust、Python、JavaScript、TypeScript、Go、C/C++ 等。
+
+### ⛓️ 区块链存证
+
+- **时间戳证明** — 将作品指纹锚定至比特币区块链，10 分钟内生成不可伪造的时间证明。**完全免费，无需账号。**
+- **永久存档** — 配合 Arweave 钱包，可将作品指纹永久存入去中心化网络（可选）。
+
+### 🔍 查验真伪
+
+把任何图片拖进"查验"页面，立刻知道：
+- 这张图是否经过元印保护
+- 印记是否完整，版权归属是否可验证
+- 如何用区块链存证文件维权
+
+### 📋 版权证书
+
+每次保护完成后自动生成版权证书，包含：
+- 文件唯一指纹
+- 保护时间戳
+- 区块链存证链接
+- 可导出为 PDF，作为维权证据
+
+---
+
+## 快速上手
+
+**第一步：设置保存目录**
+
+启动软件 → 软件设置 → 选择一个**输出目录**（保护后的文件保存在这里）。
+
+**第二步：保护你的作品**
+
+切换到"图片保护"→ 将图片拖入中间区域，或点击选择文件（支持同时选择多张）。
+处理完成后自动弹出版权证书。
+
+**第三步：查验 / 维权**
+
+如果怀疑某张图盗自你的作品：在"查验真伪"页面拖入那张图，立刻得到检测结果。
+
+---
+
+## 区块链存证怎么用？
+
+开启"区块链时间戳存证"开关（不需要任何账号或付费）→ 保护完成后在输出目录自动生成 `.ots` 证明文件。
+
+如需开启 **Arweave 永久存档**（可选），需要先安装 [ArConnect 钱包](https://www.arconnect.io/)（免费），然后在设置里导入密钥文件。
+详细步骤见 [用户指南](docs/USER_GUIDE_zh.md)。
+
+---
+
+## 隐私与安全
+
+- ✅ **100% 本地运行** — 所有处理都在你的电脑上完成，原图从不上传
+- ✅ **无账号** — 不需要注册任何账号（除非你要用 Arweave 永久存档）
+- ✅ **开源** — 代码完全公开，任何人可以审查
+
+---
+
+## 平台支持
+
+| 系统 | 架构 | 支持情况 |
+|------|------|---------|
+| macOS | Apple Silicon (M1/M2/M3) | ✅ 完整支持 |
+| macOS | Intel | ✅ 完整支持 |
+| Windows | x64 | ✅ 完整支持 |
+
+---
+
+## 开发者：从源码构建
+
+```bash
+git clone https://github.com/dolan9644/MetaSeal.git
+cd MetaSeal
+cargo tauri build     # 构建安装包
+# 或
+cargo taiku dev       # 开发模式预览
+```
+
+需要：Rust 1.75+、Node.js 18+、Tauri CLI v2
+
+---
+
+---
+
+<a id="english"></a>
+## Your art, your proof, forever.
+
+**MetaSeal** is a local-first desktop app that protects creators from AI scraping and establishes legally-usable proof of ownership — without any technical knowledge required.
+
+### What it does
+
+1. **Invisible watermark** — Embeds your identity into every pixel. Survives screenshots, compression, and cropping.
+2. **Anti-AI shield** — Prevents AI scrapers from extracting your art style for training.
+3. **Blockchain timestamp** — Anchors your work to the Bitcoin blockchain. The timestamp cannot be forged.
+
+Everything runs locally. Your originals never leave your computer.
+
+---
+
+### Features
+
+**🖼️ Image Protection**
+Drop your image in. Choose your layers:
+- *Invisible Watermark* — Authorship hidden inside the image, traceable even after heavy editing
+- *Anti-AI Shield* — Disrupts AI style extraction at the pixel level
+
+Both layers can be combined. Batch processing supported.
+
+**📝 Text Protection**
+Protects `.txt` / `.md` files with invisible signatures. Even after copy-paste across platforms, the signature travels with the text.
+
+**💻 Code Protection**
+Injects a cryptographic copyright signature into source file headers. Supports Rust, Python, JS, TS, Go, C/C++, and more.
+
+**⛓️ Blockchain Timestamping**
+Free, no account needed. Anchors your file fingerprint to the Bitcoin blockchain. Auto-generates a `.ots` proof file.
+
+**🔍 Verify**
+Drop any image into the Verify tab. Instantly see: is it watermarked? How to use the blockchain proof for a copyright claim?
+
+**📋 Copyright Certificate**
+Auto-generated after every protection. Contains file fingerprint, timestamp, and blockchain proof. Exportable as PDF for legal use.
+
+---
+
+### Quick Start
+
+1. Set an output folder in Settings
+2. Drop your files onto the protection zone
+3. A certificate auto-appears after each successful protection
+4. Use the Verify tab to check any suspicious image
+
+---
+
+### Build from Source
+
+```bash
+git clone https://github.com/dolan9644/MetaSeal.git
+cd MetaSeal
+cargo tauri build
+```
+
+Requires: Rust 1.75+, Node.js 18+, Tauri CLI v2
+
+---
+
+### License
+
+**Apache License 2.0** · Copyright © 2026 xastle
