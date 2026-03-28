@@ -14,9 +14,8 @@ const translations = {
     nav_scanner: "查验真伪",
     nav_history: "保护记录",
     nav_settings: "软件设置",
-    mode_oneoff: "单个文件",
-    mode_batch: "批量保护",
     drop_hint: "点击或拖拽文件到这里开始保护",
+    drop_hint_multi: "支持同时选择多个文件",
     execute_btn: "开始保护",
     processing: "正在处理中，请稍候...",
     settings_title: "软件设置",
@@ -36,28 +35,24 @@ const translations = {
     format_original: "保持原格式",
     onboarding_desc: "由于 MetaSeal 是完全本地运行的，您的原图不会上传到服务器。请先设置一个【保存目录】来存放保护后的文件。",
     onboarding_btn: "去设置目录",
-    batch_scan: "扫描未保护文件",
-    batch_count: "发现 {count} 个待处理文件",
-    batch_run: "一键全部保护",
-    batch_empty: "该目录下没有发现待处理的图片。",
-    batch_no_path: "请先在设置中配置【读取目录】和【输出目录】。",
-    verify_success: "验证成功：此文件包含合法的版权信息。",
-    verify_failed: "验证失败：未检测到水印。文件可能未受保护或已遭破坏。",
+    verify_watermark_found: "🟢 已检测到版权印记",
+    verify_watermark_not_found: "🔴 未检测到版权印记",
     status_verifying: "🔍 正在分析文件指纹...",
     status_scanning: "🔍 正在搜索待保护资产...",
     status_compiling: "🚀 正在计算加密指纹...",
     error_no_output: "请先在设置中挂载【输出目录】。",
     engine_header_suite: "保护功能开关",
-    engine_header_archive: "存证与永久备份 (Arweave & OTS)",
     settings_arweave: "Arweave 密钥文件",
     settings_arweave_desc: "导入您的 Arweave .json 密钥以开启永久存证功能",
     tech_standard_title: "隐藏数字水印",
     tech_standard_desc: "在图片中嵌入肉眼看不见的署名信息。即使图片被压缩、截图或剪裁，依然可以还原作者身份。",
     tech_enhanced_title: "防 AI 抓取保护",
-    tech_enhanced_desc: "针对 AI 训练进行干扰，防止您的画风或作品被 AI 无偿爬取和模拟。",
-    tech_enhanced_perf: "注：此功能需要端侧高算力支持，并占用约 100MB 磁盘空间。",
-    archive_desc: "利用区块链技术为作品打上“不可篡改”的时间戳，并同步备份至永久存储网络。",
-    archive_link: "[ 📚 查看如何获取 Arweave 密钥 ]",
+    tech_enhanced_desc: "针对 AI 训练进行干扰，防止您的画风或作品被 AI 无偿爬取和模拟。开启后处理时间会稍长。",
+    archive_ots_title: "区块链时间戳存证",
+    archive_ots_desc: "免费将作品指纹锚定至比特币区块链，生成不可伪造的时间证明。无需账号，无需付费。",
+    archive_arweave_title: "永久存档 (Arweave)",
+    archive_arweave_desc: "将受保护的作品永久备份至去中心化存储网络，任何人无法删除。",
+    archive_arweave_link: "[ 📚 免费注册 ArConnect 钱包指南 ]",
   },
   "en-US": {
     brand: "MetaSeal",
@@ -67,9 +62,8 @@ const translations = {
     nav_scanner: "Asset Verify",
     nav_history: "History",
     nav_settings: "Settings",
-    mode_oneoff: "Single File",
-    mode_batch: "Batch Protect",
     drop_hint: "Click or drop files here to protect",
+    drop_hint_multi: "Supports multiple files at once",
     execute_btn: "Protect Now",
     processing: "Processing...",
     settings_title: "Settings",
@@ -89,28 +83,24 @@ const translations = {
     format_original: "Keep Original",
     onboarding_desc: "MetaSeal runs 100% locally. Please set an [Output Folder] to save your protected assets.",
     onboarding_btn: "Set Folder",
-    batch_scan: "Scan for files",
-    batch_count: "Found {count} files",
-    batch_run: "Protect All",
-    batch_empty: "No pending files found in source folder.",
-    batch_no_path: "Halt: Please configure paths in Settings first.",
-    verify_success: "Verified: This file contains valid copyright data.",
-    verify_failed: "Failed: No signature detected.",
+    verify_watermark_found: "🟢 Watermark Detected",
+    verify_watermark_not_found: "🔴 No Watermark Found",
     status_verifying: "🔍 Analyzing fingerprint...",
     status_scanning: "🔍 Scanning folder...",
     status_compiling: "🚀 Calculating hash...",
     error_no_output: "Error: Please set Output Folder in Settings.",
-    engine_header_suite: "Engine Toggles",
-    engine_header_archive: "Blockchain Proof (Arweave & OTS)",
+    engine_header_suite: "Protection Options",
     settings_arweave: "Arweave Wallet Key",
     settings_arweave_desc: "Import your .json key to enable permanent backup",
     tech_standard_title: "Invisible Watermark",
     tech_standard_desc: "Injects invisible data into pixels. Resists compression, screenshots, and cropping.",
     tech_enhanced_title: "Anti-AI Shield",
-    tech_enhanced_desc: "Disrupts AI scraping and style mimicry at the source.",
-    tech_enhanced_perf: "Note: Requires local GPU/NPU compute and ~100MB disk.",
-    archive_desc: "Immutable timestamping and permanent cloud backup via blockchain.",
-    archive_link: "[ 📚 How to get Arweave keys ]",
+    tech_enhanced_desc: "Disrupts AI scraping and style mimicry. Processing takes slightly longer.",
+    archive_ots_title: "Blockchain Timestamp (OTS)",
+    archive_ots_desc: "Anchor your work fingerprint to Bitcoin blockchain. Free, no account needed.",
+    archive_arweave_title: "Permanent Archive (Arweave)",
+    archive_arweave_desc: "Permanently back up your protected work to decentralized storage. Cannot be deleted.",
+    archive_arweave_link: "[ 📚 Get a free ArConnect wallet ]",
   }
 };
 
@@ -124,7 +114,7 @@ const SearchIcon = () => <svg className="nav-icon" fill="none" viewBox="0 0 24 2
 const UploadArrowIcon = () => <svg className="drop-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0-15l-4.5 4.5m4.5-4.5l4.5 4.5" /></svg>;
 const VerifyMagnifyIcon = () => <svg className="drop-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
-// --- Original Zen Ring Logo ---
+// --- Brand Logo ---
 const BrandLogoElement = () => (
   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px', paddingLeft: '12px' }}>
     <svg style={{ width: '32px', height: '32px', marginRight: '10px', color: 'var(--text-main)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
@@ -147,23 +137,19 @@ function App() {
     arweave_key: ""
   });
 
-  const [activeTab, setActiveTab] = useState('Images'); 
-  const [inputMode, setInputMode] = useState<'OneOff' | 'Batch'>('OneOff');
+  const [activeTab, setActiveTab] = useState('Images');
   const [status, setStatus] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   const [lastProtectedFile, setLastProtectedFile] = useState<any>(null);
   const [scannerResult, setScannerResult] = useState<any>(null);
-  const [pendingBatchFiles, setPendingBatchFiles] = useState<string[]>([]);
   const [historyLog, setHistoryLog] = useState<any[]>([]);
-  
+
   // Protection Options
   const [isT1Enabled, setIsT1Enabled] = useState(true);
   const [isT2Enabled, setIsT2Enabled] = useState(false);
   const [isOtsEnabled, setIsOtsEnabled] = useState(false);
   const [isArweaveEnabled, setIsArweaveEnabled] = useState(false);
-  const [isEnchancedDownloaded, setIsEnchancedDownloaded] = useState(false);
-  const [downloadMsg, setDownloadMsg] = useState("");
   const [onboardingDismissed, setOnboardingDismissed] = useState(localStorage.getItem('metaseal_onboarding_dismissed') === 'true');
   const [toggleWarning, setToggleWarning] = useState("");
 
@@ -208,9 +194,9 @@ function App() {
 
   const handlePickArweaveKey = async () => {
     try {
-      const selected = await open({ 
+      const selected = await open({
         filters: [{ name: 'JSON Key', extensions: ['json'] }],
-        multiple: false 
+        multiple: false
       });
       if (selected) {
         const newSettings = { ...settings, arweave_key: selected as string };
@@ -224,7 +210,7 @@ function App() {
 
   const handlePickFileAndProtect = async () => {
     try {
-      const selected = await open({ 
+      const selected = await open({
         multiple: true,
         filters: [
           { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] },
@@ -232,12 +218,13 @@ function App() {
           { name: 'Code', extensions: ['rs', 'js', 'ts', 'py', 'c', 'cpp', 'go'] }
         ]
       });
+      const batchId = Date.now();
       if (selected && Array.isArray(selected)) {
         for (const file of selected) {
-          await handleExecuteProtection(file);
+          await handleExecuteProtection(file, batchId);
         }
       } else if (selected) {
-        await handleExecuteProtection(selected as string);
+        await handleExecuteProtection(selected as string, batchId);
       }
     } catch (e) {
       console.error("File picker error:", e);
@@ -247,74 +234,43 @@ function App() {
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // HTML5 Drag Events are mostly for visual feedback here.
-    // The actual path retrieval is handled by the tauri://drag-drop listener
-    // in the useEffect above, which has access to the OS file system paths.
+    // Actual path retrieval handled by tauri://drag-drop listener below
   };
 
-  // Add Tauri drag-drop listener
+  // Tauri drag-drop listener
   useEffect(() => {
     let unlisten: any;
     import('@tauri-apps/api/event').then(({ listen }) => {
       listen("tauri://drag-drop", (event: any) => {
         const paths = event.payload.paths;
         if (paths && paths.length > 0) {
+          const batchId = Date.now();
           for (const path of paths) {
-            handleExecuteProtection(path);
+            handleExecuteProtection(path, batchId);
           }
         }
       }).then(u => unlisten = u);
     });
     return () => { if (unlisten) unlisten(); };
-  }, [activeTab, isT2Enabled, settings.output_dir]);
+  }, [activeTab, isT1Enabled, isT2Enabled, isOtsEnabled, isArweaveEnabled, settings.output_dir]);
 
   const handleVerifyFile = async () => {
     const selected = await open({ multiple: false });
     if (selected) {
+      setScannerResult(null);
       setStatus(t.status_verifying);
       try {
-        // 按当前激活的 Tab 路由到正确的查验引擎
-        let cmd = "verify_image_t1";
-        if (activeTab === 'Text') cmd = "verify_document";
-        else if (activeTab === 'Code') cmd = "verify_code";
-        const res: any = await invoke(cmd, { path: selected as string });
-        setScannerResult(res);
-        setStatus(res.success ? t.verify_success : t.verify_failed);
+        const res: any = await invoke("verify_image_t1", { path: selected as string });
+        setScannerResult({ ...res, filePath: selected as string });
+        setStatus(res.message.includes('✅') ? t.verify_watermark_found : t.verify_watermark_not_found);
       } catch (e) {
-        setScannerResult({ success: false });
-        setStatus(t.verify_failed);
+        setScannerResult({ success: false, message: "验证过程中出现错误，请确认文件格式正确。" });
+        setStatus(t.verify_watermark_not_found);
       }
     }
   };
 
-  const handleDownloadModel = async () => {
-    setDownloadMsg("分配计算节点与存储卷空间...");
-    try {
-      const resp: string = await invoke("download_model_t2");
-      setIsEnchancedDownloaded(true);
-      setDownloadMsg(resp);
-    } catch (e: any) {
-      setDownloadMsg(`Error: ${e}`);
-    }
-  };
-
-  const handleScanBatch = async () => {
-    if (!settings.source_dir || !settings.output_dir) {
-      setStatus(t.batch_no_path);
-      return;
-    }
-    setStatus(t.status_scanning);
-    try {
-      const files: any = await invoke("get_unprotected_files", { 
-        sourceDir: settings.source_dir, 
-        outputDir: settings.output_dir 
-      });
-      setPendingBatchFiles(files);
-      setStatus(t.batch_count.replace("{count}", files.length.toString()));
-    } catch (e) { setStatus("❌ Scan failed. Check directory permissions."); }
-  };
-
-  const handleExecuteProtection = async (manualPath?: string) => {
+  const handleExecuteProtection = async (manualPath?: string, batchId?: number) => {
     const selectedFile = manualPath || `demo_${activeTab.toLowerCase()}_asset.bin`;
     if (!settings.output_dir) {
       setStatus(t.error_no_output);
@@ -327,80 +283,113 @@ function App() {
 
     try {
       let output_path = "";
-      
-      // Dynamic routing to actual backend implementations based on the tab
+
       if (activeTab === 'Images') {
-          const res: any = await invoke(isT2Enabled ? "protect_image_t2" : "protect_image_t1", { path: selectedFile, outputDir: settings.output_dir });
-          output_path = res.output_path;
+        // Apply T1 watermark first (if enabled)
+        if (isT1Enabled) {
+          const t1Res: any = await invoke("protect_image_t1", { path: selectedFile, outputDir: settings.output_dir });
+          output_path = t1Res.output_path;
+        }
+        // Then apply T2 adversarial shield on top (if enabled)
+        if (isT2Enabled) {
+          const t2Input = output_path || selectedFile;
+          const t2Res: any = await invoke("protect_image_t2", { path: t2Input, outputDir: settings.output_dir });
+          output_path = t2Res.output_path;
+        }
+        if (!output_path) {
+          throw new Error("请至少启用一种保护方式（数字水印 或 防 AI 抓取）");
+        }
       } else if (activeTab === 'Text') {
-          const res: any = await invoke("protect_document", { path: selectedFile, outputDir: settings.output_dir });
-          output_path = res.output_path;
+        const res: any = await invoke("protect_document", { path: selectedFile, outputDir: settings.output_dir });
+        output_path = res.output_path;
       } else if (activeTab === 'Code') {
-          const res: any = await invoke("protect_code", { path: selectedFile, outputDir: settings.output_dir });
-          output_path = res.output_path;
+        const res: any = await invoke("protect_code", { path: selectedFile, outputDir: settings.output_dir });
+        output_path = res.output_path;
       }
 
+      // Compute file fingerprint
       const hashRes: any = await invoke("compute_file_hash", { path: output_path });
       const hashStr = hashRes.file_hash;
 
+      // OTS blockchain anchoring (real call)
       let otsRes = "UNANCHORED";
       if (isOtsEnabled) {
-        // mock actual blockchain check
-        otsRes = "Pending Bitcoin confirmation (~10 mins)";
+        setStatus("⛓️ 正在提交区块链存证，请稍候...");
+        try {
+          const otsResult: any = await invoke("anchor_to_blockchain", { path: output_path });
+          otsRes = otsResult.message;
+        } catch (e: any) {
+          otsRes = `OTS 存证失败: ${e}`;
+        }
       }
 
+      // Arweave permanent storage
       let arweaveRes = "LOCAL_ONLY";
-      if (isArweaveEnabled) {
-        arweaveRes = "ar://VqQ..._WvU";
+      if (isArweaveEnabled && settings.arweave_key) {
+        setStatus("🌐 正在上传至 Arweave 永存网络...");
+        try {
+          const arResult: any = await invoke("anchor_to_arweave", { path: output_path, hash: hashStr });
+          arweaveRes = arResult.tx_id;
+        } catch (e: any) {
+          arweaveRes = `Arweave 上传失败: ${e}`;
+        }
       }
 
-      setStatus(`✨ Success: ${output_path}`);
-      
+      const fileName = selectedFile.split('/').pop() || selectedFile.split('\\').pop() || selectedFile;
+      setStatus(`✅ 保护完成：${fileName}`);
+
       const fileRecord = {
-        name: selectedFile.split('/').pop(),
+        name: fileName,
+        outputPath: output_path,
         hash: hashStr,
         ots: otsRes,
         arweave: arweaveRes,
-        timestamp: new Date().toLocaleString()
+        timestamp: new Date().toLocaleString(),
+        batchId: batchId || Date.now(),
+        t1Enabled: isT1Enabled,
+        t2Enabled: isT2Enabled,
       };
-      
+
       setLastProtectedFile(fileRecord);
       setHistoryLog(prev => [fileRecord, ...prev]);
+      // Auto-show certificate after successful protection
+      setShowCertificate(true);
 
     } catch (e: any) {
-      setStatus(`⚠️ Exception: ${e.message || 'System Error'}`);
-    } finally { setIsProcessing(false); }
+      setStatus(`⚠️ 保护失败：${e.message || e}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  // --- Dynamic Explaners ---
+  // --- Dynamic Explainers ---
   const getFormatSubtext = () => {
-    if (activeTab === 'Images') return "(.PNG, .JPG, .WEBP) | 支持本地批量分发";
-    if (activeTab === 'Text') return "(.TXT, .MD, .CSV) | 注意：出于结构安全，尚不支持强制向 .DOCX 等富文本二进制直接注入零宽水印。";
-    if (activeTab === 'Code') return "(.RS, .JS, .TS, .PY, ...) | 构建安全的抽象签名保护";
+    if (activeTab === 'Images') return "支持 .PNG .JPG .WEBP · 可同时选择多个文件";
+    if (activeTab === 'Text') return "支持 .TXT .MD .CSV · 暂不支持 .DOCX 富文本格式";
+    if (activeTab === 'Code') return "支持 .RS .JS .TS .PY .C .CPP .GO 等源码文件";
     return "";
   };
-  
+
   const getArchitectureExplainer = () => {
     if (settings.language !== 'zh-CN') return null;
-    
     if (activeTab === 'Images') return (
       <div className="arch-explainer">
         <b>图片保护原理:</b> 通过在像素中嵌入隐藏的水印信息，并在画面中添加抗 AI 干扰层。<br/>
         <b>主要用途:</b> 防止作品被他人盗用、非法二创，以及由于 AI 爬取导致的画风被模拟。<br/>
-        <b>使用方法:</b> 设置好保存目录后，将图片拖入上方区域即可。支持开启“防 AI 抓取”增强保护。
+        <b>使用方法:</b> 设置好保存目录后，将图片拖入上方区域即可。支持同时拖入多张图片。
       </div>
     );
     if (activeTab === 'Text') return (
       <div className="arch-explainer">
         <b>文字确权原理:</b> 在文章中植入肉眼不可见的文字追踪标识。<br/>
         <b>主要用途:</b> 即使文字被整段复制粘贴到社交媒体或公众号，依然可以查出原始作者信息。<br/>
-        <b>使用方法:</b> 上传纯文本 (.TXT) 或 Markdown (.MD) 文件。暂不支持富文本格式 (.DOCX) 以防排版损坏。
+        <b>使用方法:</b> 上传纯文本 (.TXT) 或 Markdown (.MD) 文件。
       </div>
     );
     if (activeTab === 'Code') return (
       <div className="arch-explainer">
         <b>代码安全原理:</b> 在源码头部自动生成基于文件内容的加密签名注释。<br/>
-        <b>主要用途:</b> 防止私有代码仓库被非法恶意拉取或逆向工程时丢失版权归属证明。<br/>
+        <b>主要用途:</b> 防止私有代码仓库被非法拉取时丢失版权归属证明。<br/>
         <b>使用方法:</b> 拖入源码文件，系统会自动识别语言并植入数字签章。
       </div>
     );
@@ -420,8 +409,8 @@ function App() {
             setOnboardingDismissed(true);
           }}>{t.onboarding_btn}</button>
           <button className="secondary-btn" onClick={() => {
-             localStorage.setItem('metaseal_onboarding_dismissed', 'true');
-             setOnboardingDismissed(true);
+            localStorage.setItem('metaseal_onboarding_dismissed', 'true');
+            setOnboardingDismissed(true);
           }}>稍后设置</button>
         </div>
       </div>
@@ -436,7 +425,6 @@ function App() {
 
       <div className="settings-section">
         <div className="settings-header">{t.settings_header_general}</div>
-        
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_lang}</div>
@@ -446,7 +434,6 @@ function App() {
             <option value="en-US">English</option>
           </select>
         </div>
-
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_theme}</div>
@@ -463,7 +450,6 @@ function App() {
 
       <div className="settings-section">
         <div className="settings-header">{t.settings_header_identity}</div>
-        
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_author}</div>
@@ -474,7 +460,6 @@ function App() {
             <input type="text" placeholder={t.settings_copyright} value={settings.copyright_suffix} onChange={(e) => saveSettingsToRust({...settings, copyright_suffix: e.target.value})} />
           </div>
         </div>
-
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_format}</div>
@@ -489,7 +474,6 @@ function App() {
 
       <div className="settings-section">
         <div className="settings-header">{t.settings_header_paths}</div>
-        
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_source}</div>
@@ -497,7 +481,6 @@ function App() {
           </div>
           <button className="secondary-btn" onClick={() => handlePickFolder('source_dir')}>{t.settings_choose}</button>
         </div>
-
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.settings_output}</div>
@@ -524,45 +507,23 @@ function App() {
     <div className="content-wrapper">
       <div className="page-header">
         <h1 className="page-title">{title}</h1>
-        <div className="mode-switcher">
-          <div onClick={() => setInputMode('OneOff')} className={inputMode === 'OneOff' ? 'active' : ''}>{t.mode_oneoff}</div>
-          <div onClick={() => setInputMode('Batch')} className={inputMode === 'Batch' ? 'active' : ''}>{t.mode_batch}</div>
-        </div>
       </div>
 
       {getArchitectureExplainer()}
 
-      {inputMode === 'OneOff' ? (
-        <div className="dropzone" 
-             onClick={isProcessing ? undefined : handlePickFileAndProtect} 
-             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
-             onDrop={handleDrop}
-             style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
-          <div className="drop-icon-wrapper"><UploadArrowIcon /></div>
-          <div className="drop-text">{isProcessing ? t.processing : (status || t.drop_hint)}</div>
-          <div className="drop-subtext">{getFormatSubtext()}</div>
-        </div>
-      ) : (
-        <div className="batch-view">
-          <div className="batch-controls">
-            <button className="secondary-btn" onClick={handleScanBatch}>{t.batch_scan}</button>
-            {pendingBatchFiles.length > 0 && (
-              <button className="primary-btn" onClick={async () => {
-                const files = [...pendingBatchFiles];
-                setPendingBatchFiles([]);
-                for (const f of files) {
-                  await handleExecuteProtection(f);
-                }
-              }}>{t.batch_run}</button>
-            )}
-          </div>
-          <div className="batch-status">{status || t.batch_empty}</div>
-        </div>
-      )}
+      <div className="dropzone"
+           onClick={isProcessing ? undefined : handlePickFileAndProtect}
+           onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+           onDrop={handleDrop}
+           style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.7 : 1 }}>
+        <div className="drop-icon-wrapper"><UploadArrowIcon /></div>
+        <div className="drop-text">{isProcessing ? t.processing : (status || t.drop_hint)}</div>
+        <div className="drop-subtext">{getFormatSubtext()}</div>
+      </div>
 
       <div className="settings-section">
         <div className="settings-header">{t.engine_header_suite}</div>
-        
+
         <div className="setting-row">
           <div className="setting-info">
             <div className="setting-title">{t.tech_standard_title}</div>
@@ -579,27 +540,9 @@ function App() {
             <div className="setting-info">
               <div className="setting-title">{t.tech_enhanced_title}</div>
               <div className="setting-desc">{t.tech_enhanced_desc}</div>
-              
-              <div style={{ marginTop: '12px' }}>
-                {!isEnchancedDownloaded ? (
-                  <button className="download-tiny-btn" onClick={handleDownloadModel}>{downloadMsg || "↓ 部署 ONNX 本地环境 (~97MB)"}</button>
-                ) : (
-                  <span className="tech-perf-note" style={{color: '#34C759'}}>{downloadMsg || t.tech_enhanced_perf}</span>
-                )}
-                {toggleWarning === 'onnx' && (
-                  <span className="tech-perf-note warning" style={{marginLeft: '10px'}}>请先部署环境</span>
-                )}
-              </div>
             </div>
             <label className="toggle">
-              <input type="checkbox" checked={isT2Enabled} onChange={(e) => {
-                if (e.target.checked && !isEnchancedDownloaded) {
-                  setToggleWarning('onnx');
-                  setTimeout(() => setToggleWarning(""), 3000);
-                  return;
-                }
-                setIsT2Enabled(e.target.checked);
-              }} />
+              <input type="checkbox" checked={isT2Enabled} onChange={(e) => setIsT2Enabled(e.target.checked)} />
               <span className="slider"></span>
             </label>
           </div>
@@ -607,93 +550,195 @@ function App() {
 
         <div className="setting-row">
           <div className="setting-info">
-            <div className="setting-title">{t.engine_header_archive}</div>
+            <div className="setting-title">{t.archive_ots_title}</div>
+            <div className="setting-desc">{t.archive_ots_desc}</div>
+          </div>
+          <label className="toggle">
+            <input type="checkbox" checked={isOtsEnabled} onChange={(e) => setIsOtsEnabled(e.target.checked)} />
+            <span className="slider"></span>
+          </label>
+        </div>
+
+        <div className="setting-row">
+          <div className="setting-info">
+            <div className="setting-title">{t.archive_arweave_title}</div>
             <div className="setting-desc">
-                {t.archive_desc}
-                <br />
-                <a href="#" className="external-link" onClick={(e) => { e.preventDefault(); window.open("https://github.com/dolan9644/MetaSeal/blob/main/docs/USER_GUIDE_zh.md", "_blank"); }}>{t.archive_link}</a>
-                {toggleWarning === 'arweave' && (
-                  <span className="tech-perf-note warning" style={{display: 'block', marginTop: '4px'}}>请先在设置中导入 Arweave 密钥</span>
-                )}
+              {t.archive_arweave_desc}
+              <br />
+              <a href="#" className="external-link" onClick={(e) => { e.preventDefault(); window.open("https://www.arconnect.io/", "_blank"); }}>{t.archive_arweave_link}</a>
+              {toggleWarning === 'arweave' && (
+                <span className="tech-perf-note warning" style={{display: 'block', marginTop: '4px'}}>请先在设置中导入 Arweave 密钥</span>
+              )}
             </div>
           </div>
           <label className="toggle">
-            <input type="checkbox" checked={isOtsEnabled || isArweaveEnabled} 
-                   onChange={(e) => { 
+            <input type="checkbox" checked={isArweaveEnabled}
+                   onChange={(e) => {
                      if (e.target.checked && (!settings.arweave_key || settings.arweave_key === "")) {
                        setToggleWarning('arweave');
                        setTimeout(() => setToggleWarning(""), 4000);
                        return;
                      }
-                     setIsOtsEnabled(e.target.checked); 
-                     setIsArweaveEnabled(e.target.checked); 
+                     setIsArweaveEnabled(e.target.checked);
                    }} />
             <span className="slider"></span>
           </label>
         </div>
       </div>
+    </div>
+  );
 
-      <div className="action-footer">
-        {lastProtectedFile && (
-          <button className="secondary-btn" onClick={() => setShowCertificate(true)}>查阅版权凭证记录 (Provenance)</button>
+  const VerifyView = () => {
+    const watermarkDetected = scannerResult?.message?.includes('✅');
+    const watermarkMessage = scannerResult?.message || '';
+
+    return (
+      <div className="content-wrapper">
+        <div className="page-header">
+          <h1 className="page-title">{t.nav_scanner}</h1>
+        </div>
+
+        <div className="arch-explainer">
+          <b>查验原理:</b> 对文件内部的数字印记进行技术级分析，判断是否由 MetaSeal 保护，并展示区块链存证信息。<br/>
+          <b>支持类型:</b> 受 MetaSeal 保护的图片文件（.PNG、.JPG、.WEBP）
+        </div>
+
+        <div className="dropzone"
+             onClick={handleVerifyFile}
+             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+             onDrop={handleDrop}>
+          <div className="drop-icon-wrapper"><VerifyMagnifyIcon /></div>
+          <div className="drop-text">{status || "点击选择或拖拽文件到这里进行查验"}</div>
+          <div className="drop-subtext">支持 .PNG .JPG .WEBP 图片文件</div>
+        </div>
+
+        {scannerResult && (
+          <div style={{marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
+
+            {/* Watermark Detection Result */}
+            <div className="verify-result-card" style={{borderLeft: `4px solid ${watermarkDetected ? '#34C759' : '#FF3B30'}`}}>
+              <div className="verify-status" style={{color: watermarkDetected ? '#34C759' : '#FF3B30', fontWeight: 600}}>
+                {watermarkDetected ? t.verify_watermark_found : t.verify_watermark_not_found}
+              </div>
+              <div className="verify-detail" style={{marginTop: '8px'}}>{watermarkMessage}</div>
+            </div>
+
+            {watermarkDetected && (
+              <>
+                <div className="verify-result-card">
+                  <div className="verify-status">⛓️ 区块链存证</div>
+                  <div className="verify-detail" style={{marginTop: '8px'}}>
+                    如果保护时启用了"区块链时间戳存证"，输出目录中会生成 <code>.ots</code> 证明文件。<br/>
+                    可在以下网站验证该文件的比特币时间戳：<br/>
+                    <a href="#" className="external-link" style={{marginTop: '6px', display: 'inline-block'}}
+                       onClick={(e) => { e.preventDefault(); window.open("https://opentimestamps.org/", "_blank"); }}>
+                      🔗 OpenTimestamps 在线验证
+                    </a>
+                  </div>
+                </div>
+
+                <div className="verify-result-card">
+                  <div className="verify-status">⚖️ 如何使用版权证书维权</div>
+                  <div className="verify-detail" style={{marginTop: '8px', lineHeight: '1.8'}}>
+                    <b>第一步：</b>保护作品后点击"查阅版权凭证"生成证书，保存好证书文件夹。<br/>
+                    <b>第二步：</b>区块链存证会在 10 分钟内在比特币网络确认，生成不可伪造的时间证明。<br/>
+                    <b>第三步：</b>发现侵权时，可将证书文件夹作为原创证明，向平台举报或向法院提交。<br/>
+                    <b>证明效力：</b>区块链时间戳 + 文件指纹可证明您在该时间前已拥有该作品。
+                  </div>
+                </div>
+              </>
+            )}
+
+            {!watermarkDetected && (
+              <div className="verify-result-card" style={{borderLeft: '4px solid #FF9500'}}>
+                <div className="verify-status" style={{color: '#FF9500'}}>💡 提示</div>
+                <div className="verify-detail" style={{marginTop: '8px'}}>
+                  此文件未检测到 MetaSeal 版权印记。可能原因：<br/>
+                  · 该文件未经过 MetaSeal 保护<br/>
+                  · 文件经过了大幅度压缩或格式转换导致水印减弱<br/>
+                  · 该文件为文字或代码类型（请使用对应的保护页面处理）
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
-    </div>
-  );
+    );
+  };
 
-  const VerifyView = () => (
-    <div className="content-wrapper">
-      <div className="page-header">
-        <h1 className="page-title">{t.nav_scanner}</h1>
-      </div>
-      <div className="dropzone" 
-           onClick={handleVerifyFile}
-           onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
-           onDrop={handleDrop}>
-        <div className="drop-icon-wrapper"><VerifyMagnifyIcon /></div>
-        <div className="drop-text">{status || "在此挂载数字资产以提取安全指纹"}</div>
-        <div className="drop-subtext">原印协议引擎能够追踪提取非结构化文件内部的嵌入式结构</div>
-      </div>
-      
-      {scannerResult && scannerResult.success && (
-        <div className="verify-result-card">
-          <div className="verify-status">
-            <svg style={{width:'24px'}} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            验证结果：特征指纹通过物理级匹配
-          </div>
-          <div className="verify-detail">
-             该源文件已正确绑定至安全时间锚点，且其加密结构一致性极度完美。<br/>数字权属特征已在区块链加密机制与本地离线矩阵实现了双重防篡改归档。
-          </div>
+  const HistoryView = () => {
+    // Group history items by batchId
+    const seenBatchIds = new Set<number>();
+    const batchGroups: any[][] = [];
+
+    for (const item of historyLog) {
+      const bid = item.batchId;
+      if (!seenBatchIds.has(bid)) {
+        seenBatchIds.add(bid);
+        batchGroups.push(historyLog.filter(x => x.batchId === bid));
+      }
+    }
+
+    return (
+      <div className="content-wrapper">
+        <div className="page-header">
+          <h1 className="page-title">{t.nav_history}</h1>
         </div>
-      )}
-    </div>
-  );
-
-  const HistoryView = () => (
-    <div className="content-wrapper">
-      <div className="page-header">
-        <h1 className="page-title">{t.nav_history}</h1>
-      </div>
-      {historyLog.length === 0 ? (
-        <div style={{ color: "var(--text-dim)", marginTop: "20px" }}>本地追踪日志为空档。未在此会话中探测到数字防伪行为。</div>
-      ) : (
-        <div className="history-list">
-          {historyLog.map((log, i) => (
-            <div key={i} className="history-item">
-              <div className="history-item-header">
-                <span className="history-item-title">{log.name}</span>
-                <span className="history-item-time">{log.timestamp}</span>
+        {historyLog.length === 0 ? (
+          <div style={{ color: "var(--text-dim)", marginTop: "20px" }}>
+            暂无保护记录。处理文件后将在此处显示。
+          </div>
+        ) : (
+          <div className="history-list">
+            {batchGroups.map((group: any[], gi: number) => (
+              <div key={gi} style={{marginBottom: '16px'}}>
+                {group.length > 1 && (
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'var(--text-dim)',
+                    padding: '6px 12px',
+                    background: 'var(--bg-secondary)',
+                    borderRadius: '6px 6px 0 0',
+                    borderBottom: '1px solid var(--border-color)'
+                  }}>
+                    📦 批量保护 · {group.length} 个文件 · {group[0].timestamp}
+                  </div>
+                )}
+                {group.map((log: any, i: number) => (
+                  <div key={i} className="history-item" style={{borderRadius: group.length > 1 && i === 0 ? '0' : undefined}}>
+                    <div className="history-item-header">
+                      <span className="history-item-title">📄 {log.name}</span>
+                      {group.length === 1 && <span className="history-item-time">{log.timestamp}</span>}
+                    </div>
+                    <div className="history-item-meta">
+                      🔒 文件指纹：<code style={{fontSize: '11px'}}>{log.hash ? log.hash.substring(0, 20) + '...' : '计算中'}</code>
+                    </div>
+                    <div className="history-item-meta">
+                      {log.ots && log.ots !== 'UNANCHORED'
+                        ? `⛓️ 存证：${log.ots.length > 50 ? log.ots.substring(0, 50) + '...' : log.ots}`
+                        : '○ 未启用区块链存证'}
+                    </div>
+                    <div style={{marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
+                      {log.t1Enabled && <span style={{fontSize:'11px', padding:'2px 8px', background:'#34C75920', color:'#34C759', borderRadius:'4px'}}>版权印记</span>}
+                      {log.t2Enabled && <span style={{fontSize:'11px', padding:'2px 8px', background:'#007AFF20', color:'#007AFF', borderRadius:'4px'}}>防AI抓取</span>}
+                      {log.ots !== 'UNANCHORED' && <span style={{fontSize:'11px', padding:'2px 8px', background:'#FF950020', color:'#FF9500', borderRadius:'4px'}}>⛓️ 已存证</span>}
+                    </div>
+                    <button
+                      className="secondary-btn"
+                      style={{marginTop: '10px', fontSize: '12px', padding: '5px 14px'}}
+                      onClick={() => { setLastProtectedFile(log); setShowCertificate(true); }}>
+                      查阅版权凭证
+                    </button>
+                  </div>
+                ))}
               </div>
-              <div className="history-item-meta">结构哈希值 (SHA256): {log.hash}</div>
-              <div className="history-item-meta">OTS 网络时间棘轮: {log.ots}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
-  // Derive Tab Title
   const getTabTitle = () => {
     switch(activeTab) {
       case 'Images': return t.nav_images;
@@ -701,15 +746,14 @@ function App() {
       case 'Code': return t.nav_code;
       default: return "";
     }
-  }
+  };
 
   return (
     <div className="app-container" data-theme={settings.theme}>
       {!settings.output_dir && !onboardingDismissed && <OnboardingModal />}
-      
+
       <div className="sidebar">
         <BrandLogoElement />
-
         <div className="nav-menu">
           <div className={`nav-item ${activeTab === 'Images' ? 'active' : ''}`} onClick={() => setActiveTab('Images')}>
             <ImageIcon /> <span>{t.nav_images}</span>
@@ -720,16 +764,16 @@ function App() {
           <div className={`nav-item ${activeTab === 'Code' ? 'active' : ''}`} onClick={() => setActiveTab('Code')}>
             <CodeIcon /> <span>{t.nav_code}</span>
           </div>
-          
+
           <div style={{ height: '16px' }}></div>
-          
+
           <div className={`nav-item ${activeTab === 'Scanner' ? 'active' : ''}`} onClick={() => setActiveTab('Scanner')}>
             <SearchIcon /> <span>{t.nav_scanner}</span>
           </div>
           <div className={`nav-item ${activeTab === 'History' ? 'active' : ''}`} onClick={() => setActiveTab('History')}>
             <HistoryIcon /> <span>{t.nav_history}</span>
           </div>
-          
+
           <div style={{ flex: 1 }}></div>
 
           <div className={`nav-item ${activeTab === 'Settings' ? 'active' : ''}`} onClick={() => setActiveTab('Settings')}>
@@ -739,21 +783,21 @@ function App() {
       </div>
 
       <div className="main-content">
-        {activeTab === 'Settings' ? <SettingsView /> : 
-         activeTab === 'Scanner' ? <VerifyView /> : 
-         activeTab === 'History' ? <HistoryView /> : 
+        {activeTab === 'Settings' ? <SettingsView /> :
+         activeTab === 'Scanner' ? <VerifyView /> :
+         activeTab === 'History' ? <HistoryView /> :
          <EngineView title={getTabTitle()} />}
       </div>
 
       {showCertificate && lastProtectedFile && (
-        <Certificate 
+        <Certificate
           fileName={lastProtectedFile.name}
           fileHash={lastProtectedFile.hash}
           timestamp={lastProtectedFile.timestamp}
           otsProof={lastProtectedFile.ots}
           arweaveTxId={lastProtectedFile.arweave}
-          t1Enabled={isT1Enabled}
-          t2Enabled={isT2Enabled}
+          t1Enabled={lastProtectedFile.t1Enabled ?? isT1Enabled}
+          t2Enabled={lastProtectedFile.t2Enabled ?? isT2Enabled}
           authorName={settings.author_name}
           copyrightSuffix={settings.copyright_suffix}
           onClose={() => setShowCertificate(false)}

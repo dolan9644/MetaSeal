@@ -54,8 +54,9 @@ pub async fn anchor_file(file_path: &str) -> Result<String, String> {
 
     let ots_data = ots_data.ok_or_else(|| format!("所有 OTS 日历均无法访问，最后错误: {}", last_error))?;
 
-    // 3. 保存 .ots 证明文件
-    let ots_path = path.with_extension(format!("{}.ots", path.extension().unwrap_or_default().to_str().unwrap_or("file")));
+    // 3. 保存 .ots 证明文件 (使用文件名不含原扩展名，直接加 .ots)
+    let stem = path.file_stem().unwrap_or_default().to_str().unwrap_or("file");
+    let ots_path = path.parent().unwrap_or_else(|| Path::new(".")).join(format!("{}.ots", stem));
     let mut ots_file = File::create(&ots_path).map_err(|e| e.to_string())?;
     ots_file.write_all(&ots_data).map_err(|e| e.to_string())?;
 
