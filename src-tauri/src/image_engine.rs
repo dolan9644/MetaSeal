@@ -1,24 +1,30 @@
 // Copyright 2026 xastle
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Image Engine — 基于纯 Rust DCT 的频域盲水印注入与提取
-//! 底层使用: image crate (图像 I/O) + rustdct (离散余弦变换)
+//! Image Engine — 基于 2D DCT 8×8 块的频域盲水印注入与提取
+//! 底层使用: image crate (图像 I/O) + rustdct (分离式2D离散余弦变换)
 
-use image::{GenericImageView, ImageBuffer, Rgb};
+use image::{GenericImageView, ImageBuffer, Rgb, RgbImage};
 use rustdct::DctPlanner;
 use std::path::Path;
 use serde::{Serialize, Deserialize};
+
+const BLOCK_SIZE: usize = 8;
+const WATERMARK_STRENGTH: f32 = 100.0;
+const MAX_DELTA_T1: f32 = 2.0;
+const DETECTION_THRESHOLD: f32 = 25.0;
+const NORMALIZATION_FACTOR: f32 = 256.0; // 2 * BLOCK_SIZE * 2 * BLOCK_SIZE
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProtectionResult {
@@ -27,7 +33,7 @@ pub struct ProtectionResult {
     pub output_path: Option<String>,
 }
 
-/// T1 基础档：DCT 频域盲水印注入
+/// T1 基础档：2D DCT 频域盲水印注入 (8×8 块)
 pub async fn apply_t1_protection(input_path: &str, output_dir: &str) -> Result<ProtectionResult, String> {
     let input_path_own = input_path.to_string();
     let output_dir_own = output_dir.to_string();
@@ -47,61 +53,189 @@ fn inject_dct_watermark(input_path: &str, output_dir: &str) -> Result<Protection
         .and_then(|n| n.to_str()).unwrap_or("unknown");
     let output_path = Path::new(output_dir).join(format!("seal_{}", file_name));
 
-    // 2. 提取三个颜色通道，分别在频域操作保持色彩准确
+    // 2. 转换为 RGB
     let rgb = img.to_rgb8();
-    let mut pixels_r: Vec<f32> = rgb.pixels().map(|p| p[0] as f32).collect();
-    let mut pixels_g: Vec<f32> = rgb.pixels().map(|p| p[1] as f32).collect();
-    let mut pixels_b: Vec<f32> = rgb.pixels().map(|p| p[2] as f32).collect();
+    let mut rgb_out = rgb.clone();
 
-    let n = pixels_r.len();
-    let n_f32 = n as f32;
     let mut planner = DctPlanner::new();
 
-    // 3. 水印强度：按信号长度缩放，确保逆变换后 delta 约为 ±1 像素级
-    let watermark_strength: f32 = 0.8 * n_f32;
-
-    // 4. 对每个通道执行 DCT → 注入中频水印 → IDCT → 归一化
-    let mid_start = n / 4;
-    let mid_end = n / 2;
-
-    for channel in [&mut pixels_r, &mut pixels_g, &mut pixels_b] {
-        let dct = planner.plan_dct2(n);
-        dct.process_dct2(channel);
-
-        // 在中频区段注入水印 (MetaSeal 印记)
-        for i in mid_start..mid_end {
-            channel[i] += watermark_strength;
-        }
-
-        let idct = planner.plan_dct3(n);
-        idct.process_dct3(channel);
-
-        // ★ 关键修复：rustdct 的 DCT-II/DCT-III 往返会将值放大 2*N 倍
-        // 必须在逆变换后除以 2*N 进行归一化
-        let norm = 2.0 * n_f32;
-        for val in channel.iter_mut() {
-            *val /= norm;
-        }
+    // 3. 对每个颜色通道处理 8×8 块
+    for channel_idx in 0..3 {
+        process_channel_with_watermark(&mut rgb_out, width, height, channel_idx, &mut planner)?;
     }
 
-    // 5. 重建 RGB 图像
-    let mut out_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
-    for (idx, (x, y, _)) in img.pixels().enumerate() {
-        let r = pixels_r[idx].round().clamp(0.0, 255.0) as u8;
-        let g = pixels_g[idx].round().clamp(0.0, 255.0) as u8;
-        let b = pixels_b[idx].round().clamp(0.0, 255.0) as u8;
-        out_buf.put_pixel(x, y, Rgb([r, g, b]));
-    }
-
-    // 6. 保存为与原格式一致的文件
+    // 4. 保存结果
     let output_str = output_path.to_string_lossy().to_string();
-    out_buf.save(&output_path).map_err(|e| format!("写出图像失败: {}", e))?;
+    rgb_out.save(&output_path).map_err(|e| format!("写出图像失败: {}", e))?;
 
     Ok(ProtectionResult {
         success: true,
-        message: format!("已成功为 {} 注入频域数字印记 (DCT 水印)", file_name),
+        message: format!("已成功为 {} 注入 2D DCT 频域数字印记 (8×8 块)", file_name),
         output_path: Some(output_str),
     })
+}
+
+fn process_channel_with_watermark(
+    rgb: &mut RgbImage,
+    width: u32,
+    height: u32,
+    channel_idx: usize,
+    planner: &mut DctPlanner<f32>,
+) -> Result<(), String> {
+    let width = width as usize;
+    let height = height as usize;
+
+    // 遍历所有 8×8 块
+    for block_y in (0..height).step_by(BLOCK_SIZE) {
+        for block_x in (0..width).step_by(BLOCK_SIZE) {
+            // 确定块的实际尺寸（边缘块可能更小）
+            let actual_h = std::cmp::min(BLOCK_SIZE, height - block_y);
+            let actual_w = std::cmp::min(BLOCK_SIZE, width - block_x);
+
+            // 跳过不完整的块
+            if actual_h < BLOCK_SIZE || actual_w < BLOCK_SIZE {
+                continue;
+            }
+
+            // 提取块数据为 8×8 平面数组 (行优先)
+            let mut block = [0.0f32; 64];
+            for i in 0..BLOCK_SIZE {
+                for j in 0..BLOCK_SIZE {
+                    let px = rgb.get_pixel((block_x + j) as u32, (block_y + i) as u32);
+                    block[i * BLOCK_SIZE + j] = px[channel_idx] as f32;
+                }
+            }
+
+            // 保存原始块用于 delta 限制
+            let block_original = block;
+
+            // 执行 2D DCT（行优先，列优先）
+            dct2d_forward(&mut block, planner);
+
+            // 在水印位置注入信号
+            inject_watermark_coefficients(&mut block);
+
+            // 执行逆 2D DCT（列优先，行优先）
+            dct2d_inverse(&mut block, planner);
+
+            // 限制 delta 到 ±MAX_DELTA_T1
+            for i in 0..64 {
+                let delta = block[i] - block_original[i];
+                let clamped_delta = delta.clamp(-MAX_DELTA_T1, MAX_DELTA_T1);
+                block[i] = block_original[i] + clamped_delta;
+            }
+
+            // 写回图像 (夹紧到 [0, 255])
+            for i in 0..BLOCK_SIZE {
+                for j in 0..BLOCK_SIZE {
+                    let val = block[i * BLOCK_SIZE + j].round().clamp(0.0, 255.0) as u8;
+                    let mut px = rgb.get_pixel((block_x + j) as u32, (block_y + i) as u32).clone();
+                    px[channel_idx] = val;
+                    rgb.put_pixel((block_x + j) as u32, (block_y + i) as u32, px);
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// 注入水印系数到特定的中频 2D DCT 位置
+fn inject_watermark_coefficients(block: &mut [f32; 64]) {
+    // Zigzag 对角线 3: (0,3), (1,2), (2,1), (3,0)
+    let positions_diag3 = [(0, 3), (1, 2), (2, 1), (3, 0)];
+    for (y, x) in positions_diag3.iter() {
+        let idx = y * BLOCK_SIZE + x;
+        block[idx] += WATERMARK_STRENGTH;
+    }
+
+    // Zigzag 对角线 4: (4,0), (3,1), (2,2), (1,3)
+    let positions_diag4 = [(4, 0), (3, 1), (2, 2), (1, 3)];
+    for (y, x) in positions_diag4.iter() {
+        let idx = y * BLOCK_SIZE + x;
+        block[idx] += WATERMARK_STRENGTH;
+    }
+}
+
+/// 2D DCT 正向变换 (先行后列)
+/// 使用 DctPlanner 的不归一化 DCT-II
+pub(crate) fn dct2d_forward(block: &mut [f32; 64], planner: &mut DctPlanner<f32>) {
+    // 行变换
+    for row in 0..BLOCK_SIZE {
+        let dct = planner.plan_dct2(BLOCK_SIZE);
+        let row_data = &mut block[row * BLOCK_SIZE..(row + 1) * BLOCK_SIZE];
+        dct.process_dct2(row_data);
+    }
+
+    // 列变换（需要转置访问）
+    let mut temp = [0.0f32; 64];
+    for col in 0..BLOCK_SIZE {
+        let dct = planner.plan_dct2(BLOCK_SIZE);
+        // 提取列
+        let mut col_data = [0.0f32; BLOCK_SIZE];
+        for i in 0..BLOCK_SIZE {
+            col_data[i] = block[i * BLOCK_SIZE + col];
+        }
+        // 变换
+        dct.process_dct2(&mut col_data);
+        // 写回
+        for i in 0..BLOCK_SIZE {
+            temp[i * BLOCK_SIZE + col] = col_data[i];
+        }
+    }
+    block.copy_from_slice(&temp);
+}
+
+/// 2D DCT 逆向变换 (先列后行) + 归一化
+/// 使用 DctPlanner 的不归一化 DCT-III
+/// 最后除以 256 (2*8 * 2*8)
+pub(crate) fn dct2d_inverse(block: &mut [f32; 64], planner: &mut DctPlanner<f32>) {
+    // 列变换
+    let mut temp = [0.0f32; 64];
+    for col in 0..BLOCK_SIZE {
+        let idct = planner.plan_dct3(BLOCK_SIZE);
+        // 提取列
+        let mut col_data = [0.0f32; BLOCK_SIZE];
+        for i in 0..BLOCK_SIZE {
+            col_data[i] = block[i * BLOCK_SIZE + col];
+        }
+        // 逆变换
+        idct.process_dct3(&mut col_data);
+        // 写回
+        for i in 0..BLOCK_SIZE {
+            temp[i * BLOCK_SIZE + col] = col_data[i];
+        }
+    }
+
+    // 行变换
+    for row in 0..BLOCK_SIZE {
+        let idct = planner.plan_dct3(BLOCK_SIZE);
+        let row_data = &mut temp[row * BLOCK_SIZE..(row + 1) * BLOCK_SIZE];
+        idct.process_dct3(row_data);
+    }
+
+    // 复制回 block 并归一化
+    for i in 0..64 {
+        block[i] = temp[i] / NORMALIZATION_FACTOR;
+    }
+}
+
+/// 计算图像的种子值（用于 T2 等级）
+pub(crate) fn image_seed(rgb: &RgbImage) -> u64 {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    use std::hash::{Hash, Hasher};
+
+    let (w, h) = rgb.dimensions();
+    (w, h).hash(&mut hasher);
+
+    // 对图像像素采样计算哈希
+    for pixel in rgb.pixels() {
+        pixel[0].hash(&mut hasher);
+        pixel[1].hash(&mut hasher);
+        pixel[2].hash(&mut hasher);
+    }
+
+    hasher.finish()
 }
 
 /// 从图像中提取 T1 盲水印并验证
@@ -115,26 +249,69 @@ pub async fn extract_t1_watermark(input_path: &str) -> Result<String, String> {
 
 fn verify_dct_watermark(input_path: &str) -> Result<String, String> {
     let img = image::open(input_path).map_err(|e| format!("无法读取图像: {}", e))?;
+    let (width, height) = img.dimensions();
     let rgb = img.to_rgb8();
 
-    // 提取亮度通道并做 DCT
-    let mut pixels: Vec<f32> = rgb.pixels()
-        .map(|p| 0.299 * p[0] as f32 + 0.587 * p[1] as f32 + 0.114 * p[2] as f32)
-        .collect();
+    let width = width as usize;
+    let height = height as usize;
 
     let mut planner = DctPlanner::new();
-    let dct = planner.plan_dct2(pixels.len());
-    dct.process_dct2(&mut pixels);
+    let mut total_watermark_power = 0.0f32;
+    let mut block_count = 0;
 
-    // 统计中频区段的均值，与注入强度比对
-    let mid_start = pixels.len() / 4;
-    let mid_end = pixels.len() / 2;
-    let mid_len = (mid_end - mid_start) as f32;
-    let avg: f32 = pixels[mid_start..mid_end].iter().sum::<f32>() / mid_len;
+    // 遍历所有完整 8×8 块
+    for block_y in (0..height).step_by(BLOCK_SIZE) {
+        for block_x in (0..width).step_by(BLOCK_SIZE) {
+            let actual_h = std::cmp::min(BLOCK_SIZE, height - block_y);
+            let actual_w = std::cmp::min(BLOCK_SIZE, width - block_x);
 
-    if avg.abs() > 0.1 {
-        Ok(format!("✅ 确认为 MetaSeal 保护作品（频域印记强度: {:.4}）", avg))
+            if actual_h < BLOCK_SIZE || actual_w < BLOCK_SIZE {
+                continue;
+            }
+
+            block_count += 1;
+
+            // 提取亮度通道（用于验证）
+            let mut block = [0.0f32; 64];
+            for i in 0..BLOCK_SIZE {
+                for j in 0..BLOCK_SIZE {
+                    let px = rgb.get_pixel((block_x + j) as u32, (block_y + i) as u32);
+                    let lum = 0.299 * px[0] as f32 + 0.587 * px[1] as f32 + 0.114 * px[2] as f32;
+                    block[i * BLOCK_SIZE + j] = lum;
+                }
+            }
+
+            // 2D DCT 正向变换
+            dct2d_forward(&mut block, &mut planner);
+
+            // 检查水印位置的系数
+            let watermark_positions = [
+                (0, 3), (1, 2), (2, 1), (3, 0),
+                (4, 0), (3, 1), (2, 2), (1, 3),
+            ];
+
+            for (y, x) in watermark_positions.iter() {
+                let idx = y * BLOCK_SIZE + x;
+                total_watermark_power += block[idx].abs();
+            }
+        }
+    }
+
+    if block_count == 0 {
+        return Ok("❌ 图像过小或无有效块".to_string());
+    }
+
+    let avg_coefficient = total_watermark_power / (block_count as f32 * 8.0);
+
+    if avg_coefficient > DETECTION_THRESHOLD {
+        Ok(format!(
+            "✅ 确认为 MetaSeal 保护作品（2D DCT 水印强度: {:.2}）",
+            avg_coefficient
+        ))
     } else {
-        Ok("❌ 未检测到 MetaSeal 频域印记，可能是未保护文件".to_string())
+        Ok(format!(
+            "❌ 未检测到 MetaSeal 频域印记 (强度: {:.2})，可能是未保护文件",
+            avg_coefficient
+        ))
     }
 }
