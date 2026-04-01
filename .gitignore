@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# MetaSeal Dev Tests
+.claude/
+ccpm/
+img_fix/
+check_console.cjs
+src-tauri/src/test_dct.rs
+.gemini/
+design-taste-frontend/
+

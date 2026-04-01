@@ -2,7 +2,7 @@ use metaseal_lib::{
     ProcessResult, compute_file_hash_core,
     image_engine, ots_engine, t2_engine,
     model_manager, arweave_engine, settings_manager,
-    doc_engine, code_engine
+    doc_engine, code_engine, cert_engine
 };
 
 // 核心命令：计算文件的 SHA256 指纹
@@ -99,6 +99,43 @@ async fn anchor_to_arweave(path: String, hash: String) -> Result<arweave_engine:
     arweave_engine::anchor_to_permaweb(&path, &hash).await
 }
 
+// 制作版权法务证据包
+#[tauri::command]
+async fn generate_certificate_bundle(
+    original_path: String,
+    protected_path: String,
+    original_hash: String,
+    protected_hash: String,
+    author: String,
+    copyright_suffix: String,
+    t1_enabled: bool,
+    t2_enabled: bool,
+    ots_proof: String,
+    arweave_tx: String,
+    batch_id: String,
+) -> Result<ProcessResult, String> {
+    let final_dir = cert_engine::generate_bundle(
+        &original_path, &protected_path, &original_hash, &protected_hash,
+        &author, &copyright_suffix, t1_enabled, t2_enabled, &ots_proof, &arweave_tx, &batch_id
+    ).await?;
+    
+    Ok(ProcessResult {
+        success: true,
+        message: "证据包归档完成".into(),
+        file_hash: None,
+        output_path: Some(final_dir),
+    })
+}
+
+// 验证法务证据包
+#[tauri::command]
+async fn verify_certificate_bundle(path: String) -> Result<ProcessResult, String> {
+    let message = cert_engine::verify_bundle(&path).await?;
+    Ok(ProcessResult {
+        success: true, message, file_hash: None, output_path: None
+    })
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -115,6 +152,8 @@ fn main() {
             anchor_to_blockchain,
             download_model_t2,
             anchor_to_arweave,
+            generate_certificate_bundle,
+            verify_certificate_bundle,
             settings_manager::load_settings,
             settings_manager::save_settings,
             settings_manager::get_unprotected_files

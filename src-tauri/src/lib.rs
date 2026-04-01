@@ -6,6 +6,7 @@ pub mod arweave_engine;
 pub mod settings_manager;
 pub mod doc_engine;
 pub mod code_engine;
+pub mod cert_engine;
 
 use std::fs::File;
 use std::io::{Read, BufReader};

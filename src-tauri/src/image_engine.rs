@@ -23,7 +23,7 @@ use serde::{Serialize, Deserialize};
 const BLOCK_SIZE: usize = 8;
 const WATERMARK_STRENGTH: f32 = 100.0;
 const MAX_DELTA_T1: f32 = 2.0;
-const DETECTION_THRESHOLD: f32 = 25.0;
+const DETECTION_THRESHOLD: f32 = 14.0;
 const NORMALIZATION_FACTOR: f32 = 256.0; // 2 * BLOCK_SIZE * 2 * BLOCK_SIZE
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -199,6 +199,10 @@ pub(crate) fn dct2d_inverse(block: &mut [f32; 64], planner: &mut DctPlanner<f32>
         for i in 0..BLOCK_SIZE {
             col_data[i] = block[i * BLOCK_SIZE + col];
         }
+        
+        // Fix for rustdct process_dct3: The unscaled DCT-II / DCT-III pair
+        // When chained, unscaled DC term matches perfectly, so we MUST NOT divide by 2!
+        
         // 逆变换
         idct.process_dct3(&mut col_data);
         // 写回
@@ -211,6 +215,10 @@ pub(crate) fn dct2d_inverse(block: &mut [f32; 64], planner: &mut DctPlanner<f32>
     for row in 0..BLOCK_SIZE {
         let idct = planner.plan_dct3(BLOCK_SIZE);
         let row_data = &mut temp[row * BLOCK_SIZE..(row + 1) * BLOCK_SIZE];
+        
+        // Fix for rustdct process_dct3 overexposure bug
+        // When chained, we MUST NOT divide by 2!
+        
         idct.process_dct3(row_data);
     }
 

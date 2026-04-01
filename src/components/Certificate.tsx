@@ -1,6 +1,7 @@
 import React from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { DownloadSimple, X } from "@phosphor-icons/react";
 
 interface CertificateProps {
   fileName: string;
@@ -33,7 +34,7 @@ const Certificate: React.FC<CertificateProps> = ({
     if (!certificateRef.current) return;
     
     const canvas = await html2canvas(certificateRef.current, {
-      scale: 2,
+      scale: 3,
       useCORS: true,
       backgroundColor: '#ffffff'
     });
@@ -49,84 +50,86 @@ const Certificate: React.FC<CertificateProps> = ({
   };
 
   return (
-    <div className="certificate-overlay">
-      <div className="certificate-modal">
-        <div className="certificate-actions">
-          <button onClick={downloadPDF} className="cert-btn primary">下载 PDF 证书</button>
-          <button onClick={onClose} className="cert-btn secondary">关闭</button>
-        </div>
+    <div className="w-full flex justify-center">
+      <div className="flex flex-col gap-4 w-full max-w-2xl text-slate-900">
         
-        <div className="certificate-paper" ref={certificateRef}>
-          {/* Decorative Border */}
-          <div className="cert-border"></div>
+        {/* Certificate Paper */}
+        <div ref={certificateRef} className="bg-white px-12 py-16 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] relative overflow-hidden border border-slate-200">
           
-          <div className="cert-content">
-            <div className="cert-header">
-              <div className="cert-logo">◈</div>
-              <div className="cert-id">CERTIFICATE ID: MS-{fileHash.substring(0, 12).toUpperCase()}</div>
+          <div className="absolute inset-0 m-4 border border-slate-200/50 pointer-events-none" />
+          <div className="absolute inset-0 m-[18px] border border-slate-100 pointer-events-none" />
+          
+          <div className="flex justify-between items-end border-b-2 border-slate-900 pb-4 mb-10">
+            <div className="font-serif italic text-2xl font-semibold tracking-tighter">MetaSeal</div>
+            <div className="text-[10px] font-mono tracking-widest text-slate-400">ID: MS-{fileHash.substring(0,12).toUpperCase()}</div>
+          </div>
+
+          <h1 className="text-3xl font-semibold tracking-tighter text-slate-900 mb-1">数字资产原创存证证书</h1>
+          <h2 className="text-xs tracking-widest uppercase text-slate-400 font-medium mb-12">Certificate of Provenance & Protection</h2>
+
+          <div className="text-sm leading-relaxed text-slate-600 mb-12 text-justify">
+            兹证明，该项由人类创作者 <span className="font-semibold text-slate-900">{authorName}</span> 产出的数字资产已通过 <span className="font-semibold text-slate-900">MetaSeal (元印)</span> 保护引擎进行全链路版权保护及防篡改处理。
+            其加密特征码已成功提取并锚定至去中心化信任网络。{copyrightSuffix && ` (注: ${copyrightSuffix})`}
+          </div>
+
+          <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12 border-l border-slate-200 pl-6">
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">资产名称 Asset</div>
+              <div className="font-medium text-sm text-slate-900 truncate">{fileName}</div>
             </div>
-
-            <h1 className="cert-title">数字资产原创存证证书</h1>
-            <h2 className="cert-subtitle">Certificate of Provenance & Protection</h2>
-
-            <div className="cert-statement">
-              兹证明，该项由人类创作者 <strong>{authorName}</strong> 产出的数字艺术资产已通过 <strong>MetaSeal (元印)</strong> 保护引擎进行全链路版权保护及法律存证。
-              所有加密特征已锚定至去中心化信任网络。{copyrightSuffix && ` (注: ${copyrightSuffix})`}
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">存证时间 Checkpoint</div>
+              <div className="font-medium text-sm text-slate-900 truncate">{timestamp}</div>
             </div>
-
-            <div className="cert-grid">
-              <div className="cert-item">
-                <label>资产名称 Asset Name</label>
-                <div className="value">{fileName}</div>
-              </div>
-              <div className="cert-item">
-                <label>数字指纹 SHA-256 Hash</label>
-                <div className="value mono">{fileHash}</div>
-              </div>
-              <div className="cert-item">
-                <label>存证时间 Timestamp</label>
-                <div className="value">{timestamp}</div>
-              </div>
+            <div className="col-span-2">
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">唯一特征码 SHA-256 Hash</div>
+              <div className="font-mono text-xs text-slate-800 break-all bg-slate-50 p-3 rounded">{fileHash}</div>
             </div>
+          </div>
 
-            <div className="cert-divider"></div>
-
-            <div className="cert-engine-stats">
-              <div className="engine-card">
-                <div className="engine-status">{t1Enabled ? '✓' : '—'}</div>
-                <div className="engine-label">数字水印 (Invisible Watermark)</div>
-                <div className="engine-desc">作者标识已安全嵌入。</div>
+          <div className="grid grid-cols-2 gap-4 mb-16">
+            <div className="p-4 bg-slate-50 border border-slate-100/50">
+              <div className="font-mono text-[10px] text-slate-400 mb-2">[ LAYER 1 ]</div>
+              <div className="text-xs font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span>数字版权印记</span>
+                <span className={t1Enabled ? "text-emerald-500" : "text-slate-300"}>{t1Enabled ? "INJECTED" : "OMITTED"}</span>
               </div>
-              <div className="engine-card">
-                <div className="engine-status">{t2Enabled ? '✓' : '—'}</div>
-                <div className="engine-label">AI 干扰防护 (Anti-AI Training)</div>
-                <div className="engine-desc">已应用对抗性噪声。</div>
-              </div>
+              <div className="text-[10px] text-slate-500">Invisible watermark injection.</div>
             </div>
-
-            <div className="cert-footer">
-              <div className="trust-badges">
-                <div className="badge">
-                  <span>BITCOIN ARCHIVE (OTS)</span>
-                  <small>证明: {otsProof.substring(0, 8)}...</small>
-                </div>
-                {arweaveTxId && (
-                  <div className="badge">
-                    <span>PERMAWEB (ARWEAVE)</span>
-                    <small>存证: {arweaveTxId.substring(0, 10)}...</small>
-                  </div>
-                )}
+            <div className="p-4 bg-slate-50 border border-slate-100/50">
+              <div className="font-mono text-[10px] text-slate-400 mb-2">[ LAYER 2 ]</div>
+              <div className="text-xs font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span>反抓取对抗层</span>
+                <span className={t2Enabled ? "text-emerald-500" : "text-slate-300"}>{t2Enabled ? "ACTIVE" : "OMITTED"}</span>
               </div>
-              
-              <div className="cert-signature">
-                <div className="sig-line"></div>
-                <div className="sig-label">MetaSeal 验证中心官方签章</div>
-              </div>
+              <div className="text-[10px] text-slate-500">Adversarial noise shield.</div>
             </div>
+          </div>
 
-            <div className="cert-watermark">METASEAL PROTOCOL</div>
+          <div className="flex justify-between items-end border-t border-slate-100 pt-8 mt-4">
+            <div className="flex flex-col gap-2">
+              <div className="text-[10px] font-mono bg-slate-900 text-white px-2 py-0.5 inline-block">OTS ANCHOR: {otsProof.substring(0, 16)}...</div>
+              {arweaveTxId && arweaveTxId !== "LOCAL_ONLY" && (
+                <div className="text-[10px] font-mono bg-blue-600 text-white px-2 py-0.5 inline-block">ARWEAVE DB: {arweaveTxId.substring(0, 16)}...</div>
+              )}
+            </div>
+            <div className="text-right">
+              <div className="border-b border-slate-300 w-32 mb-2"></div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-500">验证中心官方签发</div>
+            </div>
           </div>
         </div>
+
+        {/* Modal Controls */}
+        <div className="flex justify-end gap-3 mt-4">
+          <button onClick={downloadPDF} className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-2xl hover:bg-slate-800 transition-colors btn-tactile shadow-lg">
+            <DownloadSimple weight="bold" /> 保存法律存证件 (.PDF)
+          </button>
+          <button onClick={onClose} className="flex items-center justify-center w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors btn-tactile">
+            <X weight="bold" />
+          </button>
+        </div>
+
       </div>
     </div>
   );

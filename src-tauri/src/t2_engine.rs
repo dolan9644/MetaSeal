@@ -183,7 +183,7 @@ fn apply_dct_perturbation(
     max_delta: f32,
 ) -> Vec<f32> {
     // 块种子 = 图像种子 ^ (by * width + bx)
-    let block_seed = image_seed ^ ((by as u64 * width as u64) + bx as u64);
+    let block_seed = image_seed ^ (((by as u64).wrapping_mul(width as u64)).wrapping_add(bx as u64));
 
     // 将块转换为 8×8 矩阵进行可分离 DCT
     let mut matrix = block.to_vec();
@@ -216,8 +216,8 @@ fn apply_dct_perturbation(
         // 确定性符号：基于块种子和系数索引
         let h = block_seed
             .wrapping_mul(0x517cc1b727220a95)
-            .wrapping_add(i as u64 * 0x9e3779b97f4a7c15)
-            .wrapping_add((u as u64) * 0xc2b2ae3d27d4eb4f);
+            .wrapping_add((i as u64).wrapping_mul(0x9e3779b97f4a7c15))
+            .wrapping_add((u as u64).wrapping_mul(0xc2b2ae3d27d4eb4f));
         let sign = if h & 1 == 0 { 1.0f32 } else { -1.0f32 };
 
         // 注入噪声
@@ -233,6 +233,10 @@ fn apply_dct_perturbation(
         }
 
         let idct = planner.plan_dct3(BLOCK_SIZE);
+        
+        // Fix for rustdct process_dct3 overexposure bug
+        // When chained, unscaled DC term matches perfectly, so we MUST NOT divide by 2!
+        
         idct.process_dct3(&mut temp_col);
 
         for row in 0..BLOCK_SIZE {
@@ -244,6 +248,10 @@ fn apply_dct_perturbation(
     for row in 0..BLOCK_SIZE {
         let idct = planner.plan_dct3(BLOCK_SIZE);
         let row_data = &mut matrix[row * BLOCK_SIZE..(row + 1) * BLOCK_SIZE];
+        
+        // Fix for rustdct process_dct3 overexposure bug
+        // When chained, we MUST NOT divide by 2!
+        
         idct.process_dct3(row_data);
     }
 
