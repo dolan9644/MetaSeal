@@ -14,6 +14,7 @@ interface CertificateProps {
   authorName: string;
   copyrightSuffix: string;
   onClose: () => void;
+  hideControls?: boolean;
 }
 
 const Certificate: React.FC<CertificateProps> = ({ 
@@ -26,7 +27,8 @@ const Certificate: React.FC<CertificateProps> = ({
   t2Enabled,
   authorName,
   copyrightSuffix,
-  onClose 
+  onClose,
+  hideControls = false
 }) => {
   const certificateRef = React.useRef<HTMLDivElement>(null);
 
@@ -72,23 +74,25 @@ const Certificate: React.FC<CertificateProps> = ({
             其加密特征码已成功提取并锚定至去中心化信任网络。{copyrightSuffix && ` (注: ${copyrightSuffix})`}
           </div>
 
-          <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12 border-l border-slate-200 pl-6">
-            <div>
-              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">资产名称 Asset</div>
-              <div className="font-medium text-sm text-slate-900 truncate">{fileName}</div>
+          <div className="flex flex-col gap-6 mb-12 border-l border-slate-200 pl-6">
+            <div className="flex gap-8">
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">资产名称 Asset</div>
+                <div className="font-medium text-sm text-slate-900 break-words">{fileName}</div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">存证时间 Checkpoint</div>
+                <div className="font-medium text-sm text-slate-900 break-words">{timestamp}</div>
+              </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">存证时间 Checkpoint</div>
-              <div className="font-medium text-sm text-slate-900 truncate">{timestamp}</div>
-            </div>
-            <div className="col-span-2">
               <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">唯一特征码 SHA-256 Hash</div>
               <div className="font-mono text-xs text-slate-800 break-all bg-slate-50 p-3 rounded">{fileHash}</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-16">
-            <div className="p-4 bg-slate-50 border border-slate-100/50">
+          <div className="flex gap-4 mb-16">
+            <div className="flex-1 p-4 bg-slate-50 border border-slate-100/50">
               <div className="font-mono text-[10px] text-slate-400 mb-2">[ LAYER 1 ]</div>
               <div className="text-xs font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
                 <span>数字版权印记</span>
@@ -96,7 +100,7 @@ const Certificate: React.FC<CertificateProps> = ({
               </div>
               <div className="text-[10px] text-slate-500">Invisible watermark injection.</div>
             </div>
-            <div className="p-4 bg-slate-50 border border-slate-100/50">
+            <div className="flex-1 p-4 bg-slate-50 border border-slate-100/50">
               <div className="font-mono text-[10px] text-slate-400 mb-2">[ LAYER 2 ]</div>
               <div className="text-xs font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
                 <span>反抓取对抗层</span>
@@ -108,9 +112,9 @@ const Certificate: React.FC<CertificateProps> = ({
 
           <div className="flex justify-between items-end border-t border-slate-100 pt-8 mt-4">
             <div className="flex flex-col gap-2">
-              <div className="text-[10px] font-mono bg-slate-900 text-white px-2 py-0.5 inline-block">OTS ANCHOR: {otsProof.substring(0, 16)}...</div>
+              <div className="text-[10px] font-mono bg-slate-900 text-white px-3 py-1.5 flex items-center w-max rounded-sm">OTS ANCHOR: {otsProof.substring(0, 16)}...</div>
               {arweaveTxId && arweaveTxId !== "LOCAL_ONLY" && (
-                <div className="text-[10px] font-mono bg-blue-600 text-white px-2 py-0.5 inline-block">ARWEAVE DB: {arweaveTxId.substring(0, 16)}...</div>
+                <div className="text-[10px] font-mono bg-blue-600 text-white px-3 py-1.5 flex items-center w-max rounded-sm">ARWEAVE DB: {arweaveTxId.substring(0, 16)}...</div>
               )}
             </div>
             <div className="text-right">
@@ -121,14 +125,16 @@ const Certificate: React.FC<CertificateProps> = ({
         </div>
 
         {/* Modal Controls */}
-        <div className="flex justify-end gap-3 mt-4">
-          <button onClick={downloadPDF} className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-2xl hover:bg-slate-800 transition-colors btn-tactile shadow-lg">
-            <DownloadSimple weight="bold" /> 保存法律存证件 (.PDF)
-          </button>
-          <button onClick={onClose} className="flex items-center justify-center w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors btn-tactile">
-            <X weight="bold" />
-          </button>
-        </div>
+        {!hideControls && (
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={downloadPDF} className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-2xl hover:bg-slate-800 transition-colors btn-tactile shadow-lg">
+              <DownloadSimple weight="bold" /> 保存法律存证件 (.PDF)
+            </button>
+            <button onClick={onClose} className="flex items-center justify-center w-12 h-12 bg-white text-slate-600 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors btn-tactile">
+              <X weight="bold" />
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

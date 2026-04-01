@@ -25,6 +25,7 @@ export const autoGenerateAndSavePdf = async (record: any, settings: any, bundleP
         otsProof={record.ots} arweaveTxId={record.arweave} t1Enabled={record.t1Enabled} 
         t2Enabled={record.t2Enabled} authorName={settings.author_name} 
         copyrightSuffix={settings.copyright_suffix} onClose={() => {}} 
+        hideControls={true}
       />
     );
     // Give React time to flush layout and animations
