@@ -1,5 +1,5 @@
 import React from 'react';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 import { DownloadSimple, X } from "@phosphor-icons/react";
 
@@ -35,13 +35,10 @@ const Certificate: React.FC<CertificateProps> = ({
   const downloadPDF = async () => {
     if (!certificateRef.current) return;
     
-    const canvas = await html2canvas(certificateRef.current, {
-      scale: 3,
-      useCORS: true,
+    const imgData = await htmlToImage.toPng(certificateRef.current, {
+      pixelRatio: 3,
       backgroundColor: '#ffffff'
     });
-    
-    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();

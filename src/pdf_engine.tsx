@@ -1,6 +1,6 @@
 
 import { createRoot } from 'react-dom/client';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 import Certificate from './components/Certificate';
 import { invoke } from '@tauri-apps/api/core';
@@ -32,13 +32,11 @@ export const autoGenerateAndSavePdf = async (record: any, settings: any, bundleP
     setTimeout(resolve, 300); 
   });
 
-  const canvas = await html2canvas(container.childNodes[0] as HTMLElement, {
-    scale: 2, 
-    useCORS: true,
+  const node = container.childNodes[0] as HTMLElement;
+  const imgData = await htmlToImage.toJpeg(node, {
+    pixelRatio: 2,
     backgroundColor: '#ffffff'
   });
-  
-  const imgData = canvas.toDataURL('image/jpeg', 0.85);
   const pdf = new jsPDF('p', 'mm', 'a4');
   const imgProps = pdf.getImageProperties(imgData);
   const pdfWidth = pdf.internal.pageSize.getWidth();
