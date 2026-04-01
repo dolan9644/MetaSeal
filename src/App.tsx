@@ -9,6 +9,7 @@ import {
   FileText, CodeBlock, Record, DownloadSimple, ArrowUpRight
 } from "@phosphor-icons/react";
 import { cn } from "./lib/utils";
+import { autoGenerateAndSavePdf } from "./pdf_engine";
 import Certificate from "./components/Certificate";
 
 // --- Localization ---
@@ -74,6 +75,8 @@ export default function App() {
   const [status, setStatus] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   const [lastProtectedFile, setLastProtectedFile] = useState<any>(null);
   const [scannerResult, setScannerResult] = useState<any>(null);
   const [historyLog, setHistoryLog] = useState<any[]>([]);
@@ -120,9 +123,19 @@ export default function App() {
           if (activeTab === 'Scanner') {
              detectTypeAndVerify(paths[0]);
           } else {
-             // Create a random hex batch ID for single session folder drops
              const batchId = Math.random().toString(16).substr(2, 6);
-             paths.forEach((p: string) => handleExecuteProtection(p, batchId));
+             const processBatch = async (paths: string[]) => {
+               setBatchProgress({ current: 0, total: paths.length });
+               for (let i = 0; i < paths.length; i++) {
+                 setBatchProgress({ current: i + 1, total: paths.length });
+                 await handleExecuteProtection(paths[i], batchId);
+               }
+               setBatchProgress({ current: 0, total: 0 });
+               setShowCompletionPopup(true);
+               // auto hide after 5 seconds just in case they don't click
+               setTimeout(() => setShowCompletionPopup(false), 5000);
+             };
+             processBatch(paths);
           }
         }
       }).then(u => unlisten = u);
@@ -181,9 +194,20 @@ export default function App() {
     });
     const batchId = Math.random().toString(16).substr(2, 6);
     if (Array.isArray(selected)) {
-      for (const f of selected) await handleExecuteProtection(f, batchId);
+      setBatchProgress({ current: 0, total: selected.length });
+      for (let i = 0; i < selected.length; i++) {
+        setBatchProgress({ current: i + 1, total: selected.length });
+        await handleExecuteProtection(selected[i], batchId);
+      }
+      setBatchProgress({ current: 0, total: 0 });
+      setShowCompletionPopup(true);
+      setTimeout(() => setShowCompletionPopup(false), 5000);
     } else if (selected) {
+      setBatchProgress({ current: 1, total: 1 });
       await handleExecuteProtection(selected as string, batchId);
+      setBatchProgress({ current: 0, total: 0 });
+      setShowCompletionPopup(true);
+      setTimeout(() => setShowCompletionPopup(false), 5000);
     }
   };
 
@@ -271,6 +295,9 @@ export default function App() {
 
       setLastProtectedFile(record);
       setHistoryLog(prev => [record, ...prev]);
+      
+      setStatus(`正在为您印制专属证书...`);
+      await autoGenerateAndSavePdf(record, settings, bundleRes.output_path);
       
       setStatus(`✅ 已受保护并完美收录于 MetaSeal_Vault 极密母盒`);
     } catch(e:any) {
@@ -431,6 +458,22 @@ export default function App() {
                           <Record weight="duotone" className="w-20 h-20 text-slate-900" />
                         </motion.div>
                         <p className="mt-8 font-medium tracking-wide text-slate-600 animate-pulse">{status}</p>
+                        {batchProgress.total > 1 && (
+                          <div className="mt-6 flex flex-col items-center w-full max-w-xs">
+                            <div className="flex justify-between w-full text-sm font-bold font-mono tracking-widest text-slate-800 mb-2">
+                              <span>BATCH PROCESSING</span>
+                              <span>{batchProgress.current} <span className="text-slate-400">/</span> {batchProgress.total}</span>
+                            </div>
+                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden relative border border-slate-200/50">
+                               <motion.div 
+                                 className="absolute top-0 left-0 bottom-0 bg-slate-900 rounded-full"
+                                 initial={{ width: 0 }}
+                                 animate={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }}
+                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+                               />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="flex flex-col items-center text-slate-400 group-hover:text-slate-600 transition-colors z-10 text-center px-4">
@@ -585,6 +628,22 @@ export default function App() {
                 fileName={lastProtectedFile.name} fileHash={lastProtectedFile.hash} timestamp={lastProtectedFile.timestamp} otsProof={lastProtectedFile.ots} arweaveTxId={lastProtectedFile.arweave} t1Enabled={lastProtectedFile.t1Enabled} t2Enabled={lastProtectedFile.t2Enabled} authorName={settings.author_name} copyrightSuffix={settings.copyright_suffix} onClose={() => setShowCertificate(false)}
               />
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCompletionPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            className="fixed bottom-10 inset-x-0 mx-auto w-max z-[200] cursor-pointer"
+            onClick={() => setShowCompletionPopup(false)}
+          >
+            <div className="bg-slate-900 text-white shadow-[0_20px_40px_-5px_rgba(0,0,0,0.3)] rounded-full px-8 py-4 flex items-center gap-3 font-medium text-sm tracking-wide border border-slate-700/50 hover:bg-slate-800 transition-colors">
+              <CheckCircle weight="fill" className="text-emerald-400 w-5 h-5 flex-shrink-0" />
+              <span>所有资产保护均已完成！唯美 PDF 法务证书已静默附送至 Vault。</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
