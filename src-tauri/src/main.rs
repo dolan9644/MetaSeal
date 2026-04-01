@@ -137,8 +137,10 @@ async fn verify_certificate_bundle(path: String) -> Result<ProcessResult, String
 }
 // 保存由前端生成的 PDF 法务凭证 (绕过 Tauri 严苛的 WebView 文件沙盒)
 #[tauri::command]
-async fn save_pdf(path: String, data: Vec<u8>) -> Result<(), String> {
-    std::fs::write(&path, data).map_err(|e| e.to_string())?;
+async fn save_pdf_b64(path: String, b64_data: String) -> Result<(), String> {
+    use base64::{Engine as _, engine::general_purpose};
+    let decoded = general_purpose::STANDARD.decode(&b64_data).map_err(|e| e.to_string())?;
+    std::fs::write(&path, decoded).map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -163,7 +165,7 @@ fn main() {
             settings_manager::load_settings,
             settings_manager::save_settings,
             settings_manager::get_unprotected_files,
-            save_pdf
+            save_pdf_b64
         ])
         .run(tauri::generate_context!())
         .expect("MetaSeal 运行时发生致命错误");

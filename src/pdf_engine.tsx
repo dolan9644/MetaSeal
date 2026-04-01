@@ -7,10 +7,13 @@ import { invoke } from '@tauri-apps/api/core';
 
 export const autoGenerateAndSavePdf = async (record: any, settings: any, bundlePath: string) => {
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.width = '800px'; // Give it a fixed width so it formats correctly
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.opacity = '0.01';
+  container.style.pointerEvents = 'none';
+  container.style.zIndex = '-9999';
+  container.style.width = '800px'; 
   document.body.appendChild(container);
 
   const root = createRoot(container);
@@ -24,8 +27,8 @@ export const autoGenerateAndSavePdf = async (record: any, settings: any, bundleP
         copyrightSuffix={settings.copyright_suffix} onClose={() => {}} 
       />
     );
-    // Give React time to flush layout
-    setTimeout(resolve, 100); 
+    // Give React time to flush layout and animations
+    setTimeout(resolve, 300); 
   });
 
   const canvas = await html2canvas(container.childNodes[0] as HTMLElement, {
@@ -41,14 +44,15 @@ export const autoGenerateAndSavePdf = async (record: any, settings: any, bundleP
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
   
   pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-  const arrayBuffer = pdf.output('arraybuffer');
+  const dataUri = pdf.output('datauristring');
+  const base64Data = typeof dataUri === 'string' ? dataUri.split(',')[1] : '';
   
   root.unmount();
   document.body.removeChild(container);
   
   const safeFilename = record.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  await invoke('save_pdf', { 
+  await invoke('save_pdf_b64', { 
     path: `${bundlePath}/Certificate_${safeFilename}.pdf`, 
-    data: Array.from(new Uint8Array(arrayBuffer)) 
+    b64Data: base64Data 
   });
 };

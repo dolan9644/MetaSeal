@@ -2546,6 +2546,7 @@ dependencies = [
 name = "metaseal"
 version = "1.0.0"
 dependencies = [
+ "base64 0.22.1",
  "chrono",
  "futures-util",
  "hex",
