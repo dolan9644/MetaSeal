@@ -1,4 +1,4 @@
-// Copyright 2026 xastle
+// Copyright 2026 dolan9644
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ pub async fn protect_code(path: &str, output_dir: &str) -> Result<ProcessResult,
     let comment_block = match extension.as_ref() {
         "py" | "rb" | "sh" | "bash" | "zsh" => format!(
             "# ╔══════════════════════════════════════════════════════╗\n\
-             # ║  MetaSeal 版权签章 | Copyright 2026 xastle           ║\n\
+             # ║  MetaSeal 版权签章 | Copyright 2026 dolan9644           ║\n\
              # ║  唯一签名: {}  ║\n\
              # ║  Licensed under Apache 2.0                           ║\n\
              # ╚══════════════════════════════════════════════════════╝\n\n",
@@ -38,7 +38,7 @@ pub async fn protect_code(path: &str, output_dir: &str) -> Result<ProcessResult,
         ),
         "html" | "xml" | "svg" => format!(
             "<!-- ╔════════════════════════════════════════════════════╗\n\
-               -- ║  MetaSeal 版权签章 | Copyright 2026 xastle         ║\n\
+               -- ║  MetaSeal 版权签章 | Copyright 2026 dolan9644         ║\n\
                -- ║  唯一签名: {}  ║\n\
                -- ║  Licensed under Apache 2.0                         ║\n\
                -- ╚════════════════════════════════════════════════════╝ -->\n\n",
@@ -47,7 +47,7 @@ pub async fn protect_code(path: &str, output_dir: &str) -> Result<ProcessResult,
         _ => format!(
             "/*\n\
              * ╔══════════════════════════════════════════════════════╗\n\
-             * ║  MetaSeal 版权签章 | Copyright 2026 xastle           ║\n\
+             * ║  MetaSeal 版权签章 | Copyright 2026 dolan9644           ║\n\
              * ║  唯一签名: {}  ║\n\
              * ║  Licensed under Apache 2.0                           ║\n\
              * ╚══════════════════════════════════════════════════════╝\n\
