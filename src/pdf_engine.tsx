@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Certificate from './components/Certificate';
-import { writeFile } from '@tauri-apps/plugin-fs';
+import { invoke } from '@tauri-apps/api/core';
 
 export const autoGenerateAndSavePdf = async (record: any, settings: any, bundlePath: string) => {
   const container = document.createElement('div');
@@ -47,5 +47,8 @@ export const autoGenerateAndSavePdf = async (record: any, settings: any, bundleP
   document.body.removeChild(container);
   
   const safeFilename = record.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-  await writeFile(`${bundlePath}/Certificate_${safeFilename}.pdf`, new Uint8Array(arrayBuffer));
+  await invoke('save_pdf', { 
+    path: `${bundlePath}/Certificate_${safeFilename}.pdf`, 
+    data: Array.from(new Uint8Array(arrayBuffer)) 
+  });
 };
